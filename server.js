@@ -3,8 +3,6 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const { Low } = require("lowdb");
 const { JSONFile } = require("lowdb/node");
-const { nanoid } = require("nanoid");
-require("dotenv").config();
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,31 +18,25 @@ const db = new Low(adapter, {
   }
 });
 
-async function initDB() {
+async function init() {
   await db.read();
+  db.data ||= { orders: [], owner: db.data.owner };
   await db.write();
 }
-
-initDB();
-
-async function initDB() {
-  await db.read();
-  db.data ||= { orders: [], owner: { username: "admin", password: bcrypt.hashSync("1234", 10) } };
-  await db.write();
-}
-initDB();
+init();
 
 app.post("/order", async (req, res) => {
-  const { name, phone, address, pickle, quantity } = req.body;
+  const { name, phone, address, state, pincode, pickle, quantity } = req.body;
 
   const newOrder = {
-    id: nanoid(),
     name,
     phone,
     address,
+    state,
+    pincode,
     pickle,
     quantity,
-    date: new Date()
+    date: new Date().toLocaleString()
   };
 
   db.data.orders.push(newOrder);
@@ -67,10 +59,9 @@ app.post("/login", async (req, res) => {
 });
 
 app.get("/orders", async (req, res) => {
+  await db.read();
   res.json(db.data.orders);
 });
 
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
