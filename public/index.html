@@ -2,67 +2,43 @@
 <html>
 <head>
   <title>Mana Inti Ruchulu</title>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>Mana Inti Ruchulu</h1>
+  <h3>Homemade Traditional Pickles</h3>
+  <p>Owner: Padma | Contact: 9121991628</p>
 
-<h1>Mana Inti Ruchulu</h1>
-<h3>Homemade Pickles with Authentic Taste</h3>
+  <form action="/order" method="POST">
+    <label>Name:</label><br>
+    <input type="text" name="name" required><br><br>
 
-<p><strong>Owner:</strong> Padma</p>
-<p><strong>Contact:</strong> 9182542414</p>
+    <label>Phone:</label><br>
+    <input type="text" name="phone" required><br><br>
 
-<h2>Place Your Order</h2>
+    <label>Select Pickle:</label><br>
+    <select name="pickle" required>
+      <option value="Mango Pickle">Mango Pickle</option>
+      <option value="Chicken Pickle">Chicken Pickle</option>
+      <option value="Gongura Chicken">Gongura Chicken</option>
+    </select><br><br>
 
-<form id="orderForm">
+    <label>Quantity:</label><br>
+    <select name="quantity" required>
+      <option value="500g">500g</option>
+      <option value="1kg">1kg</option>
+      <option value="2kg">2kg</option>
+    </select><br><br>
 
-<input type="text" id="name" placeholder="Your Name" required>
-<input type="text" id="phone" placeholder="Phone Number" required>
-<input type="text" id="address" placeholder="Address" required>
-<input type="text" id="state" placeholder="State" required>
-<input type="text" id="pincode" placeholder="Pincode" required>
+    <label>Address:</label><br>
+    <textarea name="address" required></textarea><br><br>
 
-<select id="pickle" required>
-  <option>Mango Pickle</option>
-  <option>Lemon Pickle</option>
-  <option>Mixed Pickle</option>
-  <option>Chicken Pickle</option>
-  <option>Gongura Chicken</option>
-</select>
+    <label>State:</label><br>
+    <input type="text" name="state" required><br><br>
 
-<input type="number" id="quantity" placeholder="Quantity (kg)" required>
+    <label>Pincode:</label><br>
+    <input type="text" name="pincode" required><br><br>
 
-<button type="submit">Place Order</button>
-
-</form>
-
-<script>
-document.getElementById("orderForm").addEventListener("submit", function(e) {
-  e.preventDefault();
-
-  var name = document.getElementById("name").value;
-  var phone = document.getElementById("phone").value;
-  var address = document.getElementById("address").value;
-  var state = document.getElementById("state").value;
-  var pincode = document.getElementById("pincode").value;
-  var pickle = document.getElementById("pickle").value;
-  var quantity = document.getElementById("quantity").value;
-
-  var message = "Hello Padma,%0A%0A" +
-    "New Order Received for Mana Inti Ruchulu%0A%0A" +
-    "Customer Name: " + name + "%0A" +
-    "Customer Phone: " + phone + "%0A" +
-    "Pickle: " + pickle + "%0A" +
-    "Quantity: " + quantity + " kg%0A" +
-    "Address: " + address + ", " + state + " - " + pincode + "%0A%0A" +
-    "Please confirm delivery within 4-5 days.";
-
-  var whatsappURL = "https://wa.me/919182542414?text=" + message;
-
-  window.location.href = whatsappURL;
-});
-</script>
-
+    <button type="submit">Place Order</button>
+  </form>
 </body>
 </html>
