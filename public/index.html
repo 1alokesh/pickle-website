@@ -1,65 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Mana Inti Ruchulu</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<h1>Mana Inti Ruchulu 🍲</h1>
-<h3>Homemade Pickles with Authentic Taste</h3>
-
-<p><strong>Owner:</strong> Padma</p>
-<p><strong>Contact:</strong> 9182542414</p>
-
-<h2>Place Your Order</h2>
-
-<form id="orderForm">
-
-<input type="text" id="name" placeholder="Your Name" required>
-<input type="text" id="phone" placeholder="Phone Number" required>
-<input type="text" id="address" placeholder="Address" required>
-<input type="text" id="state" placeholder="State" required>
-<input type="text" id="pincode" placeholder="Pincode" required>
-
-<select id="pickle" required>
-  <option>Mango Pickle</option>
-  <option>Lemon Pickle</option>
-  <option>Mixed Pickle</option>
-  <option>Chicken Pickle</option>
-  <option>Gongura Chicken</option>
-</select>
-
-<input type="number" id="quantity" placeholder="Quantity (kg)" required>
-
-<button type="submit">Place Order</button>
-
-</form>
-
 <script>
-document.getElementById("orderForm").addEventListener("submit", async function(e) {
+document.getElementById("orderForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
-  const order = {
-    name: document.getElementById("name").value,
-    phone: document.getElementById("phone").value,
-    address: document.getElementById("address").value,
-    state: document.getElementById("state").value,
-    pincode: document.getElementById("pincode").value,
-    pickle: document.getElementById("pickle").value,
-    quantity: document.getElementById("quantity").value
-  };
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+  const address = document.getElementById("address").value;
+  const state = document.getElementById("state").value;
+  const pincode = document.getElementById("pincode").value;
+  const pickle = document.getElementById("pickle").value;
+  const quantity = document.getElementById("quantity").value;
 
-  await fetch("/order", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(order)
-  });
+  const message = `Hello Padma,
 
-  alert("Order placed successfully!");
-  this.reset();
+New Order Received for Mana Inti Ruchulu 🍲
+
+Customer Name: ${name}
+Customer Phone: ${phone}
+Pickle: ${pickle}
+Quantity: ${quantity} kg
+Address: ${address}, ${state} - ${pincode}
+
+Please confirm delivery within 4-5 days.`;
+
+  const whatsappURL = "https://wa.me/919182542414?text=" + encodeURIComponent(message);
+
+  window.location.href = whatsappURL;
 });
 </script>
-
-</body>
-</html>
