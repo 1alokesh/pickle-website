@@ -47,6 +47,16 @@ app.post("/order", async (req, res) => {
 
   db.data.orders.push(newOrder);
   await db.write();
+  await client.messages.create({
+  from: process.env.TWILIO_WHATSAPP,
+  to: `whatsapp:+91${phone}`,
+  body: `Hello ${name},
+
+Your order for ${pickle} (${quantity} kg) has been received.
+Delivery will be within 4 to 5 days.
+
+Thank you for buying Mana Inti Ruchulu Pickles 💚`
+});
 
   res.json({ message: "Order placed successfully!" });
 });
@@ -71,4 +81,5 @@ app.get("/orders", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 
