@@ -10,19 +10,17 @@ document.getElementById("orderForm").addEventListener("submit", function(e) {
   const pickle = document.getElementById("pickle").value;
   const quantity = document.getElementById("quantity").value;
 
-  const message = `Hello Padma,
+  const message =
+    "Hello Padma,%0A%0A" +
+    "New Order Received for Mana Inti Ruchulu 🍲%0A%0A" +
+    "Customer Name: " + name + "%0A" +
+    "Customer Phone: " + phone + "%0A" +
+    "Pickle: " + pickle + "%0A" +
+    "Quantity: " + quantity + " kg%0A" +
+    "Address: " + address + ", " + state + " - " + pincode + "%0A%0A" +
+    "Please confirm delivery within 4-5 days.";
 
-New Order Received for Mana Inti Ruchulu 🍲
-
-Customer Name: ${name}
-Customer Phone: ${phone}
-Pickle: ${pickle}
-Quantity: ${quantity} kg
-Address: ${address}, ${state} - ${pincode}
-
-Please confirm delivery within 4-5 days.`;
-
-  const whatsappURL = "https://wa.me/919182542414?text=" + encodeURIComponent(message);
+  const whatsappURL = "https://wa.me/919182542414?text=" + message;
 
   window.location.href = whatsappURL;
 });
