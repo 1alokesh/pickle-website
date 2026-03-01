@@ -50,7 +50,23 @@ app.post("/order", async (req, res) => {
 
   db.data.orders.push(newOrder);
   await db.write();
-  
+  await transporter.sendMail({
+  from: process.env.EMAIL_USER,
+  to: process.env.EMAIL_USER, // Owner receives mail
+  subject: "New Order - Mana Inti Ruchulu",
+  text: `
+New Order Received
+
+Customer Name: ${name}
+Phone: ${phone}
+Pickle: ${pickle}
+Quantity: ${quantity}
+Address: ${address}, ${state} - ${pincode}
+
+Owner: Padma
+Contact: 9121991628
+  `,
+});
 
   res.json({ message: "Order placed successfully!" });
 });
@@ -75,6 +91,7 @@ app.get("/orders", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 
 
 
