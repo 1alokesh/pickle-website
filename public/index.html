@@ -1,18 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mana Inti Ruchulu</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Mana Inti Ruchulu</h1>
+<h3>Homemade Pickles with Authentic Taste</h3>
+
+<p><strong>Owner:</strong> Padma</p>
+<p><strong>Contact:</strong> 9182542414</p>
+
+<h2>Place Your Order</h2>
+
+<form id="orderForm">
+
+<input type="text" id="name" placeholder="Your Name" required>
+<input type="text" id="phone" placeholder="Phone Number" required>
+<input type="text" id="address" placeholder="Address" required>
+<input type="text" id="state" placeholder="State" required>
+<input type="text" id="pincode" placeholder="Pincode" required>
+
+<select id="pickle" required>
+  <option>Mango Pickle</option>
+  <option>Lemon Pickle</option>
+  <option>Mixed Pickle</option>
+  <option>Chicken Pickle</option>
+  <option>Gongura Chicken</option>
+</select>
+
+<input type="number" id="quantity" placeholder="Quantity (kg)" required>
+
+<button type="submit">Place Order</button>
+
+</form>
+
 <script>
 document.getElementById("orderForm").addEventListener("submit", function(e) {
   e.preventDefault();
 
-  const name = document.getElementById("name").value;
-  const phone = document.getElementById("phone").value;
-  const address = document.getElementById("address").value;
-  const state = document.getElementById("state").value;
-  const pincode = document.getElementById("pincode").value;
-  const pickle = document.getElementById("pickle").value;
-  const quantity = document.getElementById("quantity").value;
+  var name = document.getElementById("name").value;
+  var phone = document.getElementById("phone").value;
+  var address = document.getElementById("address").value;
+  var state = document.getElementById("state").value;
+  var pincode = document.getElementById("pincode").value;
+  var pickle = document.getElementById("pickle").value;
+  var quantity = document.getElementById("quantity").value;
 
-  const message =
-    "Hello Padma,%0A%0A" +
-    "New Order Received for Mana Inti Ruchulu 🍲%0A%0A" +
+  var message = "Hello Padma,%0A%0A" +
+    "New Order Received for Mana Inti Ruchulu%0A%0A" +
     "Customer Name: " + name + "%0A" +
     "Customer Phone: " + phone + "%0A" +
     "Pickle: " + pickle + "%0A" +
@@ -20,8 +58,11 @@ document.getElementById("orderForm").addEventListener("submit", function(e) {
     "Address: " + address + ", " + state + " - " + pincode + "%0A%0A" +
     "Please confirm delivery within 4-5 days.";
 
-  const whatsappURL = "https://wa.me/919182542414?text=" + message;
+  var whatsappURL = "https://wa.me/919182542414?text=" + message;
 
   window.location.href = whatsappURL;
 });
 </script>
+
+</body>
+</html>
