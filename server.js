@@ -1,5 +1,27 @@
+const express = require("express");
+const path = require("path");
+const bodyParser = require("body-parser");
+const { Low, JSONFile } = require("lowdb");
 const nodemailer = require("nodemailer");
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Database setup
+const adapter = new JSONFile("db.json");
+const db = new Low(adapter);
+
+async function initDB() {
+  await db.read();
+  db.data ||= { orders: [] };
+  await db.write();
+}
+initDB();
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+// Email Setup
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -7,92 +29,93 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
-const express = require("express");
-const bodyParser = require("body-parser");
-const bcrypt = require("bcryptjs");
-const { Low } = require("lowdb");
-const { JSONFile } = require("lowdb/node");
 
-const app = express();
-app.use(bodyParser.json());
-app.use(express.static("public"));
-
-const adapter = new JSONFile("db.json");
-
-const db = new Low(adapter, {
-  orders: [],
-  owner: {
-    username: "admin",
-    password: bcrypt.hashSync("1234", 10)
-  }
-});
-
-async function init() {
-  await db.read();
-  db.data ||= { orders: [], owner: db.data.owner };
-  await db.write();
-}
-init();
-
+// Order Route
 app.post("/order", async (req, res) => {
-  const { name, phone, address, state, pincode, pickle, quantity } = req.body;
+  const { name, phone, pickle, quantity, address, state, pincode } = req.body;
 
-  const newOrder = {
+  if (!name || !phone || !pickle || !quantity || !address || !state || !pincode) {
+    return res.send("All fields are required.");
+  }
+
+  const order = {
     name,
     phone,
+    pickle,
+    quantity,
     address,
     state,
     pincode,
-    pickle,
-    quantity,
-    date: new Date().toLocaleString()
+    date: new Date().toLocaleString(),
   };
 
-  db.data.orders.push(newOrder);
+  await db.read();
+  db.data.orders.push(order);
   await db.write();
+
+  // Send Email to Owner
   await transporter.sendMail({
-  from: process.env.EMAIL_USER,
-  to: process.env.EMAIL_USER, // Owner receives mail
-  subject: "New Order - Mana Inti Ruchulu",
-  text: `
+    from: process.env.EMAIL_USER,
+    to: process.env.EMAIL_USER,
+    subject: "New Order - Mana Inti Ruchulu",
+    text: `
 New Order Received
 
 Customer Name: ${name}
-Phone: ${phone}
+Customer Phone: ${phone}
 Pickle: ${pickle}
 Quantity: ${quantity}
 Address: ${address}, ${state} - ${pincode}
 
 Owner: Padma
 Contact: 9121991628
-  `,
+
+Delivery within 4-5 days.
+    `,
+  });
+
+  res.send(`
+    <h2>✅ Order Placed Successfully!</h2>
+    <p>Thank you for buying from <b>Mana Inti Ruchulu</b>.</p>
+    <p>Your order will be delivered within 4-5 days.</p>
+    <a href="/">Go Back</a>
+  `);
 });
 
-  res.json({ message: "Order placed successfully!" });
-});
-
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  if (
-    username === db.data.owner.username &&
-    bcrypt.compareSync(password, db.data.owner.password)
-  ) {
-    res.json({ success: true });
-  } else {
-    res.json({ success: false });
-  }
-});
-
-app.get("/orders", async (req, res) => {
+// Admin Orders View
+app.get("/admin", async (req, res) => {
   await db.read();
-  res.json(db.data.orders);
+  const orders = db.data.orders;
+
+  let orderList = orders.map((o, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${o.name}</td>
+      <td>${o.phone}</td>
+      <td>${o.pickle}</td>
+      <td>${o.quantity}</td>
+      <td>${o.address}, ${o.state} - ${o.pincode}</td>
+      <td>${o.date}</td>
+    </tr>
+  `).join("");
+
+  res.send(`
+    <h1>Mana Inti Ruchulu - All Orders</h1>
+    <table border="1" cellpadding="10">
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Pickle</th>
+        <th>Quantity</th>
+        <th>Address</th>
+        <th>Date</th>
+      </tr>
+      ${orderList}
+    </table>
+  `);
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-
-
-
-
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
+});
