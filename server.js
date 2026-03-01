@@ -11,7 +11,21 @@ app.use(bodyParser.json());
 app.use(express.static("public"));
 
 const adapter = new JSONFile("db.json");
-const db = new Low(adapter);
+
+const db = new Low(adapter, {
+  orders: [],
+  owner: {
+    username: "admin",
+    password: bcrypt.hashSync("1234", 10)
+  }
+});
+
+async function initDB() {
+  await db.read();
+  await db.write();
+}
+
+initDB();
 
 async function initDB() {
   await db.read();
@@ -59,3 +73,4 @@ app.get("/orders", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
