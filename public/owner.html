@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Owner Login</title>
+  <title>Owner Panel - Mana Inti Ruchulu</title>
 </head>
 <body>
 
@@ -14,21 +14,23 @@
 <div id="orders"></div>
 
 <script>
+
 async function login() {
   const res = await fetch("/login", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({
-      username: username.value,
-      password: password.value
+      username: document.getElementById("username").value,
+      password: document.getElementById("password").value
     })
   });
 
   const data = await res.json();
+
   if (data.success) {
     loadOrders();
   } else {
-    alert("Invalid login");
+    alert("Invalid Login");
   }
 }
 
@@ -37,12 +39,26 @@ async function loadOrders() {
   const orders = await res.json();
 
   let html = "<h3>All Orders</h3>";
-  orders.forEach(order => {
-    html += `<p>${order.name} ordered ${order.quantity}kg of ${order.pickle}</p>`;
-  });
+
+  if (orders.length === 0) {
+    html += "<p>No Orders Yet</p>";
+  } else {
+    orders.forEach(order => {
+      html += `
+      <hr>
+      <p><strong>Name:</strong> ${order.name}</p>
+      <p><strong>Phone:</strong> ${order.phone}</p>
+      <p><strong>Pickle:</strong> ${order.pickle}</p>
+      <p><strong>Quantity:</strong> ${order.quantity} kg</p>
+      <p><strong>Address:</strong> ${order.address}, ${order.state} - ${order.pincode}</p>
+      <p><strong>Date:</strong> ${order.date}</p>
+      `;
+    });
+  }
 
   document.getElementById("orders").innerHTML = html;
 }
+
 </script>
 
 </body>
