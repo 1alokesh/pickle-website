@@ -1,48 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Homemade Pickles</title>
+  <title>Mana Inti Ruchulu</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Order Homemade Pickles 🍯</h1>
 
-  <form id="orderForm">
-    <input type="text" placeholder="Your Name" id="name" required>
-    <input type="text" placeholder="Phone Number" id="phone" required>
-    <input type="text" placeholder="Address" id="address" required>
+<h1>Mana Inti Ruchulu 🍲</h1>
+<h3>Homemade Pickles with Authentic Taste</h3>
 
-    <select id="pickle">
-      <option>Mango Pickle</option>
-      <option>Lemon Pickle</option>
-      <option>Mixed Pickle</option>
-    </select>
+<p><strong>Owner:</strong> Padma</p>
+<p><strong>Contact:</strong> 9121991628</p>
 
-    <input type="number" placeholder="Quantity (kg)" id="quantity" required>
-    <button type="submit">Place Order</button>
-  </form>
+<h2>Place Your Order</h2>
 
-  <script>
-    document.getElementById("orderForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
+<form id="orderForm">
 
-      const order = {
-        name: name.value,
-        phone: phone.value,
-        address: address.value,
-        pickle: pickle.value,
-        quantity: quantity.value
-      };
+<input type="text" id="name" placeholder="Your Name" required>
+<input type="text" id="phone" placeholder="Phone Number" required>
+<input type="text" id="address" placeholder="Address" required>
+<input type="text" id="state" placeholder="State" required>
+<input type="text" id="pincode" placeholder="Pincode" required>
 
-      const res = await fetch("/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(order)
-      });
+<select id="pickle" required>
+  <option>Mango Pickle</option>
+  <option>Lemon Pickle</option>
+  <option>Mixed Pickle</option>
+  <option>Chicken Pickle</option>
+  <option>Gongura Chicken</option>
+</select>
 
-      alert("Order placed successfully!");
-      this.reset();
-    });
-  </script>
+<input type="number" id="quantity" placeholder="Quantity (kg)" required>
+
+<button type="submit">Place Order</button>
+
+</form>
+
+<script>
+document.getElementById("orderForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const order = {
+    name: document.getElementById("name").value,
+    phone: document.getElementById("phone").value,
+    address: document.getElementById("address").value,
+    state: document.getElementById("state").value,
+    pincode: document.getElementById("pincode").value,
+    pickle: document.getElementById("pickle").value,
+    quantity: document.getElementById("quantity").value
+  };
+
+  await fetch("/order", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(order)
+  });
+
+  alert("Order placed successfully!");
+  this.reset();
+});
+</script>
+
 </body>
 </html>
