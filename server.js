@@ -10,25 +10,35 @@ const PORT = process.env.PORT || 3000;
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(bodyParser.json()); // for JSON posts
 app.use(express.static(path.join(__dirname, "public")));
 
-// Create db.json if not exists
+// Ensure db.json exists
 if (!fs.existsSync("db.json")) {
   fs.writeFileSync("db.json", JSON.stringify({ orders: [] }, null, 2));
 }
 
 /* ================= ORDER ROUTE ================= */
-
 app.post("/order", async (req, res) => {
   try {
     const { name, phone, address, state, pincode, totalPrice, items } = req.body;
 
+    // Check required fields
     if (!name || !phone || !address || !state || !pincode || !totalPrice || !items) {
       return res.send("All fields are required.");
     }
 
-    const parsedItems = JSON.parse(items);
+    // Parse items JSON if string
+    let parsedItems = [];
+    if (typeof items === "string") {
+      try {
+        parsedItems = JSON.parse(items);
+      } catch {
+        return res.send("Items format invalid.");
+      }
+    } else {
+      parsedItems = items;
+    }
 
     const data = JSON.parse(fs.readFileSync("db.json"));
     const orderId = Date.now();
@@ -48,13 +58,13 @@ app.post("/order", async (req, res) => {
     data.orders.push(order);
     fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
-    // Format item details for email
-    let itemDetails = "";
+    // Format items for email
+    let itemText = "";
     parsedItems.forEach((item, index) => {
-      itemDetails += `${index + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}\n`;
+      itemText += `${index + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}\n`;
     });
 
-    // Send Email to Owner
+    // Send Owner Email
     await resend.emails.send({
       from: "Mana Inti Ruchulu <onboarding@resend.dev>",
       to: process.env.EMAIL_USER,
@@ -68,9 +78,9 @@ Phone: ${phone}
 Address: ${address}, ${state} - ${pincode}
 
 Items Ordered:
-${itemDetails}
+${itemText}
 
-Total Amount: ₹${totalPrice}
+Total Price: ₹${totalPrice}
 
 Owner: Padma
 Contact: 9121991628
@@ -87,10 +97,8 @@ Contact: 9121991628
 });
 
 /* ================= SUCCESS PAGE ================= */
-
 app.get("/success", (req, res) => {
   const orderId = req.query.id;
-
   res.send(`
     <h2>✅ Order Placed Successfully!</h2>
     <p><b>Thank you for ordering from Mana Inti Ruchulu!</b></p>
@@ -106,7 +114,6 @@ app.get("/success", (req, res) => {
 });
 
 /* ================= INVOICE PDF ================= */
-
 app.get("/invoice/:id", (req, res) => {
   const orderId = req.params.id;
   const data = JSON.parse(fs.readFileSync("db.json"));
@@ -140,11 +147,8 @@ app.get("/invoice/:id", (req, res) => {
 
   doc.text("Items Ordered:");
   doc.moveDown();
-
   order.items.forEach((item, index) => {
-    doc.text(
-      `${index + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}`
-    );
+    doc.text(`${index + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}`);
   });
 
   doc.moveDown();
@@ -163,7 +167,6 @@ app.get("/invoice/:id", (req, res) => {
 });
 
 /* ================= ADMIN PAGE ================= */
-
 app.get("/admin", (req, res) => {
   const data = JSON.parse(fs.readFileSync("db.json"));
   const orders = data.orders;
@@ -195,8 +198,7 @@ app.get("/admin", (req, res) => {
   `);
 });
 
-/* ================= SERVER ================= */
-
+/* ================= START SERVER ================= */
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port " + PORT);
 });
