@@ -1,3 +1,4 @@
+const PDFDocument = require("pdfkit");
 const { Resend } = require("resend");
 const express = require("express");
 const path = require("path");
@@ -100,12 +101,38 @@ Thank you for supporting Mana Inti Ruchulu 🙏
     });
 
     // Success Page
-    res.send(`
-      <h2>✅ Order Placed Successfully!</h2>
-      <p>Thank you for buying from <b>Mana Inti Ruchulu</b>.</p>
-      <p>Your order will be delivered within 4-5 days.</p>
-      <a href="/">Go Back</a>
-    `);
+    const orderId = Date.now();
+
+res.send(`
+  <html>
+    <head>
+      <title>Order Confirmed</title>
+    </head>
+    <body style="font-family: Arial; text-align: center; padding: 40px;">
+      <h2>✅ Order Confirmed!</h2>
+      <p>Thank you for ordering from <b>Mana Inti Ruchulu</b></p>
+
+      <p><strong>Order ID:</strong> ${orderId}</p>
+      <p><strong>Pickle:</strong> ${pickle}</p>
+      <p><strong>Quantity:</strong> ${quantity}</p>
+
+      <p>Delivery within <b>4-5 days</b></p>
+
+      <p><b>Owner:</b> Padma</p>
+      <p><b>Contact:</b> 9121991628</p>
+
+      <br><br>
+
+      <a href="/receipt/${orderId}" 
+         style="padding:10px 20px; background:green; color:white; text-decoration:none;">
+         Download Receipt
+      </a>
+
+      <br><br>
+      <a href="/">Back to Home</a>
+    </body>
+  </html>
+`);
 
   } catch (error) {
     console.error(error);
@@ -150,11 +177,41 @@ app.get("/admin", (req, res) => {
     </table>
   `);
 });
+app.get("/receipt/:id", (req, res) => {
+  const orderId = req.params.id;
 
+  const data = JSON.parse(fs.readFileSync("db.json"));
+  const order = data.orders[data.orders.length - 1];
+
+  const doc = new PDFDocument();
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `attachment; filename=receipt-${orderId}.pdf`);
+
+  doc.pipe(res);
+
+  doc.fontSize(20).text("Mana Inti Ruchulu", { align: "center" });
+  doc.moveDown();
+
+  doc.fontSize(14).text(`Order ID: ${orderId}`);
+  doc.text(`Customer Name: ${order.name}`);
+  doc.text(`Phone: ${order.phone}`);
+  doc.text(`Pickle: ${order.pickle}`);
+  doc.text(`Quantity: ${order.quantity}`);
+  doc.text(`Address: ${order.address}, ${order.state} - ${order.pincode}`);
+  doc.moveDown();
+
+  doc.text("Delivery within 4-5 days.");
+  doc.moveDown();
+  doc.text("Owner: Padma");
+  doc.text("Contact: 9121991628");
+
+  doc.end();
+});
 // ==============================
 // START SERVER
 // ==============================
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
