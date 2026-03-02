@@ -1,205 +1,141 @@
 <!DOCTYPE html>
-<html>
-    <input type="hidden" name="items" id="itemsInput">
+<html lang="en">
 <head>
-    <title>Mana Inti Ruchulu Pickles</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #fff8f0;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-
-        header {
-            background-color: #b22222;
-            color: white;
-            padding: 20px;
-        }
-
-        .owner-info {
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .container {
-            padding: 20px;
-        }
-
-        .cards {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .card {
-            background: white;
-            width: 260px;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .card img {
-            width: 100%;
-            height: 180px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        select, input, textarea {
-            width: 90%;
-            padding: 8px;
-            margin: 5px 0;
-        }
-
-        button {
-            background: green;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background: darkgreen;
-        }
-
-        .total {
-            font-size: 20px;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mana Inti Ruchulu Pickles</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #fff8e1; }
+    h1 { text-align: center; color: #b71c1c; }
+    .pickles { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-bottom: 20px; }
+    .pickle-item { border: 1px solid #ccc; padding: 10px; border-radius: 10px; width: 200px; text-align: center; background: #fff; }
+    .pickle-item img { width: 150px; height: 150px; object-fit: cover; border-radius: 10px; }
+    .total { font-size: 18px; margin-top: 10px; font-weight: bold; text-align: center; }
+    button { background: #b71c1c; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    button:hover { background: #f44336; }
+    input, select { width: 100%; margin-top: 5px; padding: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    form { max-width: 600px; margin: auto; background: #fff3e0; padding: 20px; border-radius: 10px; }
+  </style>
 </head>
-
 <body>
 
-<header>
-    <h1>🥭 Mana Inti Ruchulu Pickles</h1>
-    <div class="owner-info">
-        Owner: Padma | WhatsApp: 9121991628
-    </div>
-</header>
+<h1>Mana Inti Ruchulu Pickles</h1>
 
-<div class="container">
+<form id="orderForm">
+  <input type="text" id="name" placeholder="Your Name" required>
+  <input type="text" id="phone" placeholder="Phone Number" required>
+  <input type="text" id="address" placeholder="Address" required>
+  <input type="text" id="state" placeholder="State" required>
+  <input type="text" id="pincode" placeholder="Pincode" required>
 
-<form action="/order" method="POST" onsubmit="return validateForm()">
-
-<div class="cards">
-
-    <!-- Mango -->
-    <div class="card">
-        <h3>🥭 Mango Pickle</h3>
-        <img src="/images/mango.jpg" alt="Mango Pickle">
-
-        <select onchange="updatePrice('Mango', this.value)">
-            <option value="0">Select Size</option>
-            <option value="320">1 Kg - ₹320</option>
-            <option value="160">500g - ₹160</option>
-            <option value="80">250g - ₹80</option>
-        </select>
+  <h2>Select Pickles</h2>
+  <div class="pickles">
+    <!-- Mango Pickle -->
+    <div class="pickle-item" data-name="Mango Pickle">
+      <img src="images/mango.jpg" alt="Mango Pickle">
+      <div>Mango Pickle</div>
+      <select class="size-select">
+        <option value="1kg" data-price="320">1kg - ₹320</option>
+        <option value="500gms" data-price="160">500gms - ₹160</option>
+        <option value="250gms" data-price="80">250gms - ₹80</option>
+      </select>
+      <input type="number" class="quantity-input" value="0" min="0">
     </div>
 
-    <!-- Chicken -->
-    <div class="card">
-        <h3>🍗 Chicken Pickle</h3>
-        <img src="/images/chicken.jpg" alt="Chicken Pickle">
-
-        <select onchange="updatePrice('Chicken', this.value)">
-            <option value="0">Select Size</option>
-            <option value="900">1 Kg - ₹900</option>
-            <option value="450">500g - ₹450</option>
-            <option value="230">250g - ₹230</option>
-        </select>
+    <!-- Chicken Pickle -->
+    <div class="pickle-item" data-name="Chicken Pickle">
+      <img src="images/chicken.jpg" alt="Chicken Pickle">
+      <div>Chicken Pickle</div>
+      <select class="size-select">
+        <option value="1kg" data-price="900">1kg - ₹900</option>
+        <option value="500gms" data-price="450">500gms - ₹450</option>
+        <option value="250gms" data-price="230">250gms - ₹230</option>
+      </select>
+      <input type="number" class="quantity-input" value="0" min="0">
     </div>
 
     <!-- Gongura Chicken -->
-    <div class="card">
-        <h3>🌿 Gongura Chicken Pickle</h3>
-        <img src="/images/gongura.jpg" alt="Gongura Chicken Pickle">
-
-        <select onchange="updatePrice('Gongura Chicken', this.value)">
-            <option value="0">Select Size</option>
-            <option value="900">1 Kg - ₹900</option>
-            <option value="450">500g - ₹450</option>
-            <option value="230">250g - ₹230</option>
-        </select>
+    <div class="pickle-item" data-name="Gongura Chicken">
+      <img src="images/gongura.jpg" alt="Gongura Chicken">
+      <div>Gongura Chicken</div>
+      <select class="size-select">
+        <option value="1kg" data-price="900">1kg - ₹900</option>
+        <option value="500gms" data-price="450">500gms - ₹450</option>
+        <option value="250gms" data-price="230">250gms - ₹230</option>
+      </select>
+      <input type="number" class="quantity-input" value="0" min="0">
     </div>
+  </div>
 
-</div>
+  <div class="total">Total: ₹<span id="totalPrice">0</span></div>
 
-<div class="total" id="finalPrice">
-    Total Price: ₹0
-</div>
-
-<input type="hidden" name="price" id="selectedPrice">
-
-<h3>Customer Details</h3>
-
-<input type="text" name="name" placeholder="Full Name" required><br>
-<input type="text" name="phone" placeholder="Phone Number" required><br>
-<textarea name="address" placeholder="Full Address" required></textarea><br>
-<input type="text" name="state" placeholder="State" required><br>
-<input type="text" name="pincode" placeholder="Pincode" required><br>
-
-<button type="submit">Place Order</button>
-
+  <button type="submit">Place Order</button>
 </form>
 
-</div>
-
 <script>
-let prices = {
-    "Mango": 0,
-    "Chicken": 0,
-    "Gongura Chicken": 0
-};
+  const form = document.getElementById("orderForm");
+  const totalPriceEl = document.getElementById("totalPrice");
 
-function updatePrice(name, price) {
-    prices[name] = parseInt(price) || 0;
-    calculateTotal();
-}
-
-function calculateTotal() {
+  function calculateTotal() {
     let total = 0;
-    for (let item in prices) {
-        total += prices[item];
+    document.querySelectorAll(".pickle-item").forEach(item => {
+      const qty = parseInt(item.querySelector(".quantity-input").value) || 0;
+      const price = parseInt(item.querySelector(".size-select").selectedOptions[0].dataset.price);
+      total += qty * price;
+    });
+    totalPriceEl.innerText = total;
+    return total;
+  }
+
+  document.querySelectorAll(".quantity-input, .size-select").forEach(el => {
+    el.addEventListener("input", calculateTotal);
+    el.addEventListener("change", calculateTotal);
+  });
+
+  form.addEventListener("submit", function(e){
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const state = document.getElementById("state").value.trim();
+    const pincode = document.getElementById("pincode").value.trim();
+
+    const items = [];
+    document.querySelectorAll(".pickle-item").forEach(item => {
+      const itemName = item.dataset.name;
+      const size = item.querySelector(".size-select").value;
+      const price = parseInt(item.querySelector(".size-select").selectedOptions[0].dataset.price);
+      const quantity = parseInt(item.querySelector(".quantity-input").value) || 0;
+      if(quantity > 0) {
+        items.push({
+          name: itemName,
+          size: size,
+          quantity: quantity,
+          total: quantity * price
+        });
+      }
+    });
+
+    if(!name || !phone || !address || !state || !pincode || items.length === 0){
+      alert("All fields are required and select at least one pickle.");
+      return;
     }
 
-    document.getElementById("finalPrice").innerText = "Total Price: ₹" + total;
-    document.getElementById("selectedPrice").value = total;
-}
+    const totalPrice = items.reduce((acc, i) => acc + i.total, 0);
 
-function validateForm() {
-    let total = 0;
-    for (let item in prices) {
-        total += prices[item];
-    }
-
-    if (total === 0) {
-        alert("Please select at least one pickle.");
-        return false;
-    }
-
-    return true;
-}
-
-function updateHiddenItems() {
-  document.getElementById("itemsInput").value = JSON.stringify(cart);
-}
-
-document.querySelector("form").addEventListener("submit", function () {
-  updateHiddenItems();
-});
-
+    fetch("/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, address, state, pincode, items: JSON.stringify(items), totalPrice })
+    })
+    .then(res => res.text())
+    .then(data => {
+      document.body.innerHTML = data;
+    })
+    .catch(err => console.error(err));
+  });
 </script>
 
 </body>
 </html>
-
