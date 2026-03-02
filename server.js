@@ -7,7 +7,6 @@ const PDFDocument = require("pdfkit");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -18,7 +17,6 @@ if (!fs.existsSync("db.json")) {
 }
 
 // ================= ORDER ROUTE =================
-
 app.post("/order", async (req, res) => {
   try {
     const { name, phone, address, state, pincode, price } = req.body;
@@ -27,7 +25,12 @@ app.post("/order", async (req, res) => {
       return res.send("All fields are required.");
     }
 
+    const data = JSON.parse(fs.readFileSync("db.json"));
+
+    const orderId = Date.now(); // unique order id
+
     const order = {
+      id: orderId,
       name,
       phone,
       address,
@@ -37,11 +40,10 @@ app.post("/order", async (req, res) => {
       date: new Date().toLocaleString(),
     };
 
-    const data = JSON.parse(fs.readFileSync("db.json"));
     data.orders.push(order);
     fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
-    // ============ SEND OWNER EMAIL ============
+    // Send Owner Email
     await resend.emails.send({
       from: "Mana Inti Ruchulu <onboarding@resend.dev>",
       to: process.env.EMAIL_USER,
@@ -49,6 +51,7 @@ app.post("/order", async (req, res) => {
       text: `
 New Order Received
 
+Order ID: ${orderId}
 Customer Name: ${name}
 Phone: ${phone}
 Address: ${address}, ${state} - ${pincode}
@@ -59,40 +62,8 @@ Contact: 9121991628
       `,
     });
 
-    // ============ GENERATE PDF ============
-    const doc = new PDFDocument();
-    
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename=Mana_Inti_Ruchulu_Order.pdf`
-    );
-
-    doc.pipe(res);
-
-    doc.fontSize(20).text("Mana Inti Ruchulu Pickles", { align: "center" });
-    doc.moveDown();
-    doc.fontSize(14).text("Order Invoice");
-    doc.moveDown();
-
-    doc.text(`Customer Name: ${name}`);
-    doc.text(`Phone: ${phone}`);
-    doc.text(`Address: ${address}`);
-    doc.text(`State: ${state}`);
-    doc.text(`Pincode: ${pincode}`);
-    doc.moveDown();
-
-    doc.text(`Total Amount: ₹${price}`);
-    doc.moveDown();
-
-    doc.text("Owner: Padma");
-    doc.text("Contact: 9121991628");
-    doc.moveDown();
-
-    doc.text("Thank you for ordering from Mana Inti Ruchulu!");
-    doc.text("Owner will contact you on WhatsApp for confirmation.");
-
-    doc.end();
+    // Redirect to success page
+    res.redirect(`/success?id=${orderId}`);
 
   } catch (error) {
     console.error(error);
@@ -100,8 +71,69 @@ Contact: 9121991628
   }
 });
 
-// ================= ADMIN PAGE =================
+// ================= SUCCESS PAGE =================
+app.get("/success", (req, res) => {
+  const orderId = req.query.id;
 
+  res.send(`
+    <h2>✅ Order Placed Successfully!</h2>
+    <p>Thank you for ordering from <b>Mana Inti Ruchulu</b>.</p>
+    <p>Owner will contact you on WhatsApp for confirmation and payment.</p>
+    <br>
+    <a href="/invoice/${orderId}">
+      <button>Download Invoice PDF</button>
+    </a>
+    <br><br>
+    <a href="/">Go Back to Home</a>
+  `);
+});
+
+// ================= INVOICE ROUTE =================
+app.get("/invoice/:id", (req, res) => {
+  const orderId = req.params.id;
+  const data = JSON.parse(fs.readFileSync("db.json"));
+  const order = data.orders.find(o => o.id == orderId);
+
+  if (!order) {
+    return res.send("Order not found.");
+  }
+
+  const doc = new PDFDocument();
+
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename=Mana_Inti_Ruchulu_Invoice.pdf`
+  );
+
+  doc.pipe(res);
+
+  doc.fontSize(20).text("Mana Inti Ruchulu Pickles", { align: "center" });
+  doc.moveDown();
+  doc.fontSize(14).text("Order Invoice");
+  doc.moveDown();
+
+  doc.text(`Order ID: ${order.id}`);
+  doc.text(`Customer Name: ${order.name}`);
+  doc.text(`Phone: ${order.phone}`);
+  doc.text(`Address: ${order.address}`);
+  doc.text(`State: ${order.state}`);
+  doc.text(`Pincode: ${order.pincode}`);
+  doc.moveDown();
+
+  doc.text(`Total Amount: ₹${order.price}`);
+  doc.moveDown();
+
+  doc.text("Owner: Padma");
+  doc.text("Contact: 9121991628");
+  doc.moveDown();
+
+  doc.text("Thank you for ordering from Mana Inti Ruchulu!");
+
+  doc.end();
+});
+
+// ================= ADMIN PAGE =================
 app.get("/admin", (req, res) => {
   const data = JSON.parse(fs.readFileSync("db.json"));
   const orders = data.orders;
@@ -109,9 +141,9 @@ app.get("/admin", (req, res) => {
   let orderList = orders.map((o, index) => `
     <tr>
       <td>${index + 1}</td>
+      <td>${o.id}</td>
       <td>${o.name}</td>
       <td>${o.phone}</td>
-      <td>${o.address}, ${o.state} - ${o.pincode}</td>
       <td>₹${o.price}</td>
       <td>${o.date}</td>
     </tr>
@@ -122,9 +154,9 @@ app.get("/admin", (req, res) => {
     <table border="1" cellpadding="10">
       <tr>
         <th>#</th>
+        <th>Order ID</th>
         <th>Name</th>
         <th>Phone</th>
-        <th>Address</th>
         <th>Total Price</th>
         <th>Date</th>
       </tr>
