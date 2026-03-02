@@ -1,13 +1,13 @@
 const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 
-
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -18,36 +18,39 @@ if (!fs.existsSync("db.json")) {
   fs.writeFileSync("db.json", JSON.stringify({ orders: [] }, null, 2));
 }
 
-
-// Order Route
+// =======================
+// ORDER ROUTE
+// =======================
 app.post("/order", async (req, res) => {
-  const { name, phone, pickle, quantity, address, state, pincode } = req.body;
+  try {
+    const { name, phone, pickle, quantity, address, state, pincode } = req.body;
 
-  if (!name || !phone || !pickle || !quantity || !address || !state || !pincode) {
-    return res.send("All fields are required.");
-  }
+    if (!name || !phone || !pickle || !quantity || !address || !state || !pincode) {
+      return res.send("All fields are required.");
+    }
 
-  const order = {
-    name,
-    phone,
-    pickle,
-    quantity,
-    address,
-    state,
-    pincode,
-    date: new Date().toLocaleString(),
-  };
+    const order = {
+      name,
+      phone,
+      pickle,
+      quantity,
+      address,
+      state,
+      pincode,
+      date: new Date().toLocaleString(),
+    };
 
-  // Read existing data
-  const data = JSON.parse(fs.readFileSync("db.json"));
-  data.orders.push(order);
-  fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
+    // Save order
+    const data = JSON.parse(fs.readFileSync("db.json"));
+    data.orders.push(order);
+    fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
- await resend.emails.send({
-  from: "Mana Inti Ruchulu <onboarding@resend.dev>",
-  to: process.env.EMAIL_USER,
-  subject: "New Order - Mana Inti Ruchulu",
-  text: `
+    // Send Email
+    await resend.emails.send({
+      from: "Mana Inti Ruchulu <onboarding@resend.dev>",
+      to: process.env.EMAIL_USER,
+      subject: "New Order - Mana Inti Ruchulu",
+      text: `
 New Order Received
 
 Customer Name: ${name}
@@ -58,10 +61,25 @@ Address: ${address}, ${state} - ${pincode}
 
 Owner: Padma
 Contact: 9121991628
-  `,
+      `,
+    });
+
+    // SUCCESS RESPONSE
+    res.send(`
+      <h2>✅ Order Placed Successfully!</h2>
+      <p>Thank you for ordering from <b>Mana Inti Ruchulu</b>.</p>
+      <a href="/">Go Back</a>
+    `);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error placing order.");
+  }
 });
 
-// Admin Page
+// =======================
+// ADMIN ROUTE
+// =======================
 app.get("/admin", (req, res) => {
   const data = JSON.parse(fs.readFileSync("db.json"));
   const orders = data.orders;
@@ -95,7 +113,9 @@ app.get("/admin", (req, res) => {
   `);
 });
 
+// =======================
+// SERVER START
+// =======================
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
-
