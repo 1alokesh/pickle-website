@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+    <input type="hidden" name="items" id="itemsInput">
 <head>
     <title>Mana Inti Ruchulu Pickles</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -188,7 +189,17 @@ function validateForm() {
 
     return true;
 }
+
+function updateHiddenItems() {
+  document.getElementById("itemsInput").value = JSON.stringify(cart);
+}
+
+document.querySelector("form").addEventListener("submit", function () {
+  updateHiddenItems();
+});
+
 </script>
 
 </body>
 </html>
+
