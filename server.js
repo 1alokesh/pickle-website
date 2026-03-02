@@ -1,8 +1,10 @@
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
 const fs = require("fs");
-const nodemailer = require("nodemailer");
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,14 +18,6 @@ if (!fs.existsSync("db.json")) {
   fs.writeFileSync("db.json", JSON.stringify({ orders: [] }, null, 2));
 }
 
-// Email Setup
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
 
 // Order Route
 app.post("/order", async (req, res) => {
@@ -49,33 +43,22 @@ app.post("/order", async (req, res) => {
   data.orders.push(order);
   fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
-  // Send Email
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: process.env.EMAIL_USER,
-    subject: "New Order - Mana Inti Ruchulu",
-    text: `
+ await resend.emails.send({
+  from: "Mana Inti Ruchulu <onboarding@resend.dev>",
+  to: process.env.EMAIL_USER,
+  subject: "New Order - Mana Inti Ruchulu",
+  text: `
 New Order Received
 
 Customer Name: ${name}
-Customer Phone: ${phone}
+Phone: ${phone}
 Pickle: ${pickle}
 Quantity: ${quantity}
 Address: ${address}, ${state} - ${pincode}
 
 Owner: Padma
 Contact: 9121991628
-
-Delivery within 4-5 days.
-    `,
-  });
-
-  res.send(`
-    <h2>✅ Order Placed Successfully!</h2>
-    <p>Thank you for buying from <b>Mana Inti Ruchulu</b>.</p>
-    <p>Your order will be delivered within 4-5 days.</p>
-    <a href="/">Go Back</a>
-  `);
+  `,
 });
 
 // Admin Page
@@ -115,3 +98,4 @@ app.get("/admin", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
