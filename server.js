@@ -1,25 +1,20 @@
 const express = require("express");
 const path = require("path");
 const bodyParser = require("body-parser");
-const { Low, JSONFile } = require("lowdb");
+const fs = require("fs");
 const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database setup
-const adapter = new JSONFile("db.json");
-const db = new Low(adapter);
-
-async function initDB() {
-  await db.read();
-  db.data ||= { orders: [] };
-  await db.write();
-}
-initDB();
-
+// Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
+
+// Ensure db.json exists
+if (!fs.existsSync("db.json")) {
+  fs.writeFileSync("db.json", JSON.stringify({ orders: [] }, null, 2));
+}
 
 // Email Setup
 const transporter = nodemailer.createTransport({
@@ -49,11 +44,12 @@ app.post("/order", async (req, res) => {
     date: new Date().toLocaleString(),
   };
 
-  await db.read();
-  db.data.orders.push(order);
-  await db.write();
+  // Read existing data
+  const data = JSON.parse(fs.readFileSync("db.json"));
+  data.orders.push(order);
+  fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
-  // Send Email to Owner
+  // Send Email
   await transporter.sendMail({
     from: process.env.EMAIL_USER,
     to: process.env.EMAIL_USER,
@@ -82,10 +78,10 @@ Delivery within 4-5 days.
   `);
 });
 
-// Admin Orders View
-app.get("/admin", async (req, res) => {
-  await db.read();
-  const orders = db.data.orders;
+// Admin Page
+app.get("/admin", (req, res) => {
+  const data = JSON.parse(fs.readFileSync("db.json"));
+  const orders = data.orders;
 
   let orderList = orders.map((o, index) => `
     <tr>
@@ -119,4 +115,3 @@ app.get("/admin", async (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
-
