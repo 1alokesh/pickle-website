@@ -76,7 +76,7 @@ Contact: 9121991628
     // ==============================
     await resend.emails.send({
       from: "Mana Inti Ruchulu <onboarding@resend.dev>",
-      to: email,
+      to: process.env.EMAIL_USER,
       subject: "Your Order is Confirmed - Mana Inti Ruchulu",
       text: `
 Hello ${name},
@@ -157,3 +157,4 @@ app.get("/admin", (req, res) => {
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
