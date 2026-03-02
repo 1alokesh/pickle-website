@@ -2,46 +2,163 @@
 <html>
 <head>
   <title>Mana Inti Ruchulu</title>
+  <style>
+    body {
+      font-family: Arial;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+
+    header {
+      background: #8B0000;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      padding: 30px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .product {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .product img {
+      width: 150px;
+      height: 150px;
+      border-radius: 8px;
+      object-fit: cover;
+    }
+
+    .product-details {
+      flex: 1;
+    }
+
+    select, input {
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+    }
+
+    .total-box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .customer-form {
+      background: white;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 8px;
+    }
+
+    button {
+      background: green;
+      color: white;
+      padding: 12px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background: darkgreen;
+    }
+  </style>
 </head>
 <body>
+
+<header>
   <h1>Mana Inti Ruchulu</h1>
-  <h3>Homemade Traditional Pickles</h3>
-  <p>Owner: Padma | Contact: 9121991628</p>
+  <p>Home Made Traditional Pickles</p>
+</header>
 
-  <form action="/order" method="POST">
-    <label>Name:</label><br>
-    <input type="text" name="name" required><br><br>
+<div class="container">
 
-    <label>Phone:</label><br>
-    <input type="text" name="phone" required><br><br>
-    <label>Email:</label><br>
-    <input type="email" name="email" required /><br><br>
+<form action="/order" method="POST">
 
-    <label>Select Pickle:</label><br>
-    <select name="pickle" required>
-      <option value="Mango Pickle">Mango Pickle</option>
-      <option value="Chicken Pickle">Chicken Pickle</option>
-      <option value="Gongura Chicken">Gongura Chicken</option>
-    </select><br><br>
+  <!-- Mango -->
+  <div class="product">
+    <img src="https://images.unsplash.com/photo-1604908177522-432c6e63e3c5" alt="Mango Pickle">
+    <div class="product-details">
+      <h3>Mango Pickle</h3>
 
-    <label>Quantity:</label><br>
-    <select name="quantity" required>
-      <option value="500g">500g</option>
-      <option value="1kg">1kg</option>
-      <option value="2kg">2kg</option>
-    </select><br><br>
+      <select name="pickle" onchange="updatePrice()" id="pickleSelect">
+        <option value="">Select Pickle</option>
+        <option value="Mango-320">Mango - 1kg - ₹320</option>
+        <option value="Mango-160">Mango - 500g - ₹160</option>
+        <option value="Mango-80">Mango - 250g - ₹80</option>
 
-    <label>Address:</label><br>
-    <textarea name="address" required></textarea><br><br>
+        <option value="Chicken-900">Chicken - 1kg - ₹900</option>
+        <option value="Chicken-450">Chicken - 500g - ₹450</option>
+        <option value="Chicken-230">Chicken - 250g - ₹230</option>
 
-    <label>State:</label><br>
-    <input type="text" name="state" required><br><br>
+        <option value="Gongura Chicken-900">Gongura Chicken - 1kg - ₹900</option>
+        <option value="Gongura Chicken-450">Gongura Chicken - 500g - ₹450</option>
+        <option value="Gongura Chicken-230">Gongura Chicken - 250g - ₹230</option>
+      </select>
 
-    <label>Pincode:</label><br>
-    <input type="text" name="pincode" required><br><br>
+      <label>Quantity</label>
+      <input type="number" name="quantity" id="qty" value="1" min="1" onchange="updatePrice()">
+
+    </div>
+  </div>
+
+  <div class="total-box">
+    Total Price: ₹ <span id="total">0</span>
+  </div>
+
+  <!-- Customer Details -->
+  <div class="customer-form">
+    <h3>Customer Details</h3>
+
+    <input type="text" name="name" placeholder="Full Name" required>
+    <input type="text" name="phone" placeholder="Phone Number" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="text" name="address" placeholder="Full Address" required>
+    <input type="text" name="state" placeholder="State" required>
+    <input type="text" name="pincode" placeholder="Pincode" required>
+
+    <input type="hidden" name="finalPrice" id="finalPrice">
 
     <button type="submit">Place Order</button>
-  </form>
+  </div>
+
+</form>
+
+</div>
+
+<script>
+function updatePrice() {
+  const select = document.getElementById("pickleSelect").value;
+  const qty = document.getElementById("qty").value;
+
+  if (select) {
+    const price = parseInt(select.split("-")[1]);
+    const total = price * qty;
+    document.getElementById("total").innerText = total;
+    document.getElementById("finalPrice").value = total;
+  }
+}
+</script>
+
 </body>
 </html>
-
