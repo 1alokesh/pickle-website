@@ -1,222 +1,191 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mana Inti Ruchulu</title>
+  <title>Mana Inti Ruchulu Pickles</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial;
       background: #fff8f0;
       margin: 0;
       padding: 0;
-    }
-
-    header {
-      background: #8B0000;
-      color: white;
       text-align: center;
-      padding: 20px;
     }
 
-    header p {
-      margin: 5px 0;
+    h1 {
+      background: #b22222;
+      color: white;
+      padding: 15px;
+      margin: 0;
+    }
+
+    .owner {
+      margin: 10px;
       font-size: 14px;
     }
 
-    .container {
+    form {
       padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    h2 {
-      text-align: center;
-      color: #8B0000;
     }
 
     .pickle-container {
       display: flex;
+      justify-content: center;
       gap: 20px;
       flex-wrap: wrap;
-      justify-content: center;
+      margin-bottom: 20px;
     }
 
-    .pickle-card {
-      border: 2px solid #ddd;
-      border-radius: 10px;
-      width: 250px;
-      padding: 15px;
-      text-align: center;
-      cursor: pointer;
-      transition: 0.3s;
+    .card {
       background: white;
+      padding: 15px;
+      width: 250px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ddd;
     }
 
-    .pickle-card:hover {
-      border-color: green;
-      transform: scale(1.05);
-    }
-
-    .pickle-card.selected {
-      border-color: green;
-      background: #f0fff0;
-    }
-
-    .pickle-card img {
+    .card img {
       width: 100%;
       height: 150px;
-      object-fit: cover;
-      border-radius: 10px;
-    }
-
-    .size-options {
-      margin-top: 10px;
+      border-radius: 8px;
     }
 
     select {
-      padding: 5px;
-      margin-top: 5px;
-    }
-
-    input, textarea {
       width: 100%;
-      padding: 10px;
+      padding: 8px;
       margin-top: 10px;
     }
 
+    input, textarea {
+      width: 90%;
+      padding: 8px;
+      margin: 8px 0;
+    }
+
     button {
-      background: #8B0000;
+      background: #b22222;
       color: white;
-      padding: 12px;
+      padding: 10px 20px;
       border: none;
-      margin-top: 15px;
-      width: 100%;
-      font-size: 16px;
       cursor: pointer;
+      border-radius: 5px;
     }
 
     button:hover {
-      background: green;
+      background: #8b0000;
     }
 
     #finalPrice {
-      text-align: center;
-      font-size: 20px;
-      margin-top: 15px;
-      color: green;
+      font-size: 18px;
+      margin: 15px;
       font-weight: bold;
+      color: green;
     }
   </style>
 </head>
 
 <body>
 
-<header>
-  <h1>Mana Inti Ruchulu</h1>
-  <p>Owner: Padma</p>
-  <p>Contact: 9121991628</p>
-</header>
+<h1>Mana Inti Ruchulu Pickles</h1>
 
-<div class="container">
-
-<h2>Select Your Pickle</h2>
+<div class="owner">
+  Owner: <b>Padma</b> | Contact: <b>9121991628</b>
+</div>
 
 <form action="/order" method="POST" onsubmit="return validateForm()">
 
-<div class="pickle-container">
+  <div class="pickle-container">
 
-  <!-- Mango -->
-  <div class="pickle-card" onclick="selectPickle('Mango')">
-    <img src="https://images.unsplash.com/photo-1604908177522-42937a6b93f2" alt="Mango Pickle">
-    <h3>Mango Pickle</h3>
+    <!-- Mango -->
+    <div class="card">
+      <img src="https://i.imgur.com/Xp6Jz9M.jpg" alt="Mango Pickle">
+      <h3>Mango Pickle</h3>
+      <select onchange="updatePrice('Mango', this.value)">
+        <option value="0">Select</option>
+        <option value="320">1 Kg - ₹320</option>
+        <option value="160">500g - ₹160</option>
+        <option value="80">250g - ₹80</option>
+      </select>
+    </div>
 
-    <select onchange="updatePrice('Mango', this.value)">
-      <option value="">Select Size</option>
-      <option value="80">250g - ₹80</option>
-      <option value="160">500g - ₹160</option>
-      <option value="320">1kg - ₹320</option>
-    </select>
+    <!-- Chicken -->
+    <div class="card">
+      <img src="https://i.imgur.com/OCdZC0U.jpg" alt="Chicken Pickle">
+      <h3>Chicken Pickle</h3>
+      <select onchange="updatePrice('Chicken', this.value)">
+        <option value="0">Select</option>
+        <option value="900">1 Kg - ₹900</option>
+        <option value="450">500g - ₹450</option>
+        <option value="230">250g - ₹230</option>
+      </select>
+    </div>
 
-    <input type="hidden" name="pickle" id="selectedPickle">
-    <input type="hidden" name="price" id="selectedPrice">
+    <!-- Gongura Chicken -->
+    <div class="card">
+      <img src="https://i.imgur.com/nw7R2wL.jpg" alt="Gongura Chicken Pickle">
+      <h3>Gongura Chicken</h3>
+      <select onchange="updatePrice('Gongura Chicken', this.value)">
+        <option value="0">Select</option>
+        <option value="900">1 Kg - ₹900</option>
+        <option value="450">500g - ₹450</option>
+        <option value="230">250g - ₹230</option>
+      </select>
+    </div>
+
   </div>
 
-  <!-- Chicken -->
-  <div class="pickle-card" onclick="selectPickle('Chicken')">
-    <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950" alt="Chicken Pickle">
-    <h3>Chicken Pickle</h3>
+  <div id="finalPrice">Total Price: ₹0</div>
 
-    <select onchange="updatePrice('Chicken', this.value)">
-      <option value="">Select Size</option>
-      <option value="230">250g - ₹230</option>
-      <option value="450">500g - ₹450</option>
-      <option value="900">1kg - ₹900</option>
-    </select>
-  </div>
+  <input type="hidden" name="price" id="selectedPrice">
 
-  <!-- Gongura Chicken -->
-  <div class="pickle-card" onclick="selectPickle('Gongura Chicken')">
-    <img src="https://images.unsplash.com/photo-1617191519105-d07b98b9c7f1" alt="Gongura Chicken Pickle">
-    <h3>Gongura Chicken</h3>
+  <h3>Customer Details</h3>
 
-    <select onchange="updatePrice('Gongura Chicken', this.value)">
-      <option value="">Select Size</option>
-      <option value="230">250g - ₹230</option>
-      <option value="450">500g - ₹450</option>
-      <option value="900">1kg - ₹900</option>
-    </select>
-  </div>
+  <input type="text" name="name" placeholder="Your Name" required><br>
+  <input type="number" name="phone" placeholder="Phone Number" required><br>
+  <textarea name="address" placeholder="Full Address" required></textarea><br>
+  <input type="text" name="state" placeholder="State" required><br>
+  <input type="number" name="pincode" placeholder="Pincode" required><br>
 
-</div>
-
-<h3 id="finalPrice">Total Price: ₹0</h3>
-
-<h2>Customer Details</h2>
-
-<input type="text" name="name" placeholder="Your Name" required>
-<input type="text" name="phone" placeholder="Phone Number" required>
-<textarea name="address" placeholder="Full Address" required></textarea>
-<input type="text" name="state" placeholder="State" required>
-<input type="text" name="pincode" placeholder="Pincode" required>
-
-<button type="submit">Place Order</button>
+  <button type="submit">Place Order</button>
 
 </form>
 
-</div>
-
 <script>
 
-let selectedPickle = "";
-let selectedPrice = 0;
-
-function selectPickle(name) {
-  selectedPickle = name;
-  document.getElementById("selectedPickle").value = name;
-
-  document.querySelectorAll('.pickle-card').forEach(card => {
-    card.classList.remove('selected');
-  });
-
-  event.currentTarget.classList.add('selected');
-}
+let prices = {
+  "Mango": 0,
+  "Chicken": 0,
+  "Gongura Chicken": 0
+};
 
 function updatePrice(name, price) {
-  if(price !== "") {
-    selectedPickle = name;
-    selectedPrice = price;
-    document.getElementById("selectedPickle").value = name;
-    document.getElementById("selectedPrice").value = price;
-    document.getElementById("finalPrice").innerText = "Total Price: ₹" + price;
+  prices[name] = parseInt(price) || 0;
+  calculateTotal();
+}
+
+function calculateTotal() {
+  let total = 0;
+  for (let item in prices) {
+    total += prices[item];
   }
+
+  document.getElementById("finalPrice").innerText =
+    "Total Price: ₹" + total;
+
+  document.getElementById("selectedPrice").value = total;
 }
 
 function validateForm() {
-  if(selectedPickle === "" || selectedPrice == 0) {
-    alert("Please select pickle and size.");
+  let total = 0;
+  for (let item in prices) {
+    total += prices[item];
+  }
+
+  if (total === 0) {
+    alert("Please select at least one pickle.");
     return false;
   }
+
   return true;
 }
 
