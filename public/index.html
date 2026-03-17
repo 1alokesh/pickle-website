@@ -2,156 +2,168 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guntur Inti Ruchulu Pickles</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
-    body { font-family: 'Roboto', sans-serif; margin: 0; background: #fff7f0; }
-    header { background: #b71c1c; color: #fff; text-align: center; padding: 30px 10px; }
-    header h1 { margin: 0; font-size: 32px; }
-    form { max-width: 900px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-    .customer-details { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
-    .customer-details input { flex: 1 1 45%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; }
-    h2 { color: #b71c1c; margin-bottom: 15px; text-align: center; }
-    .pickles { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
-    .pickle-item { background: #fff3e0; border-radius: 15px; padding: 15px; width: 220px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .pickle-item img { width: 180px; height: 180px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
-    .pickle-item select, .pickle-item input { width: 100%; padding: 7px; margin-top: 5px; border-radius: 6px; border: 1px solid #ccc; }
-    .total { font-size: 20px; font-weight: bold; text-align: center; margin: 20px 0; }
-    button { display: block; margin: 0 auto; background: #b71c1c; color: #fff; border: none; padding: 15px 30px; font-size: 18px; border-radius: 10px; cursor: pointer; }
-    button:hover { background: #e53935; }
-    @media(max-width: 768px) { .pickle-item { width: 45%; } .customer-details input { flex: 1 1 100%; } }
-    @media(max-width: 480px) { .pickle-item { width: 100%; } }
-    const submitBtn = document.querySelector("button");
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(to right, #fff7f0, #ffe0b2);
+    }
 
-form.addEventListener("submit", function(e){
-  e.preventDefault();
+    header {
+      background: linear-gradient(135deg, #b71c1c, #e53935);
+      color: #fff;
+      text-align: center;
+      padding: 30px;
+    }
 
-  submitBtn.innerText = "Placing Order...";
-  submitBtn.disabled = true;
+    header h1 {
+      margin: 0;
+    }
+
+    form {
+      max-width: 900px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 20px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .pickle-item {
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+
+    .pickle-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #b71c1c, #e53935);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      transform: scale(1.02);
+    }
   </style>
 </head>
+
 <body>
 
 <header>
   <h1>Guntur Inti Ruchulu Pickles</h1>
-  <p>Delicious pickles made at home, delivered fresh!</p>
+  <p>Homemade Authentic Taste</p>
 </header>
 
-<form id="orderForm">
-  <div class="customer-details">
-    <input type="text" id="name" placeholder="Your Name" required>
-    <input type="text" id="phone" placeholder="Phone Number" required>
-    <input type="text" id="address" placeholder="Address" required>
-    <input type="text" id="state" placeholder="State" required>
-    <input type="text" id="pincode" placeholder="Pincode" required>
+<form action="/order" method="POST">
+
+  <h2>Customer Details</h2>
+
+  <input type="text" name="name" placeholder="Full Name" required>
+
+  <!-- ✅ PHONE FIELD -->
+  <input 
+    type="tel" 
+    id="phone" 
+    name="phone" 
+    required 
+    maxlength="10" 
+    pattern="[0-9]{10}" 
+    placeholder="Enter 10-digit mobile number"
+  >
+
+  <textarea name="address" placeholder="Address" required></textarea>
+
+  <input type="text" name="state" placeholder="State" required>
+  <input type="text" name="pincode" placeholder="Pincode" required>
+
+  <h2>Order Items</h2>
+
+  <!-- SAMPLE ITEMS -->
+  <div class="pickle-item">
+    <label>
+      <input type="checkbox" name="items" value="Mango Pickle"> Mango Pickle
+    </label>
   </div>
 
-  <h2>Select Your Pickles</h2>
-  <div class="pickles">
-    <!-- Mango Pickle -->
-    <div class="pickle-item" data-name="Mango Pickle">
-      <img src="images/mango.jpg" alt="Mango Pickle">
-      <div><b>Mango Pickle</b></div>
-      <select class="size-select">
-        <option value="1kg" data-price="320">1kg - ₹320</option>
-        <option value="500gms" data-price="160">500gms - ₹160</option>
-        <option value="250gms" data-price="80">250gms - ₹80</option>
-      </select>
-      <input type="number" class="quantity-input" value="0" min="0">
-    </div>
-
-    <!-- Chicken Pickle -->
-    <div class="pickle-item" data-name="Chicken Pickle">
-      <img src="images/chicken.jpg" alt="Chicken Pickle">
-      <div><b>Chicken Pickle</b></div>
-      <select class="size-select">
-        <option value="1kg" data-price="900">1kg - ₹900</option>
-        <option value="500gms" data-price="450">500gms - ₹450</option>
-        <option value="250gms" data-price="230">250gms - ₹230</option>
-      </select>
-      <input type="number" class="quantity-input" value="0" min="0">
-    </div>
-
-    <!-- Gongura Chicken -->
-    <div class="pickle-item" data-name="Gongura Chicken">
-      <img src="images/gongura.jpg" alt="Gongura Chicken">
-      <div><b>Gongura Chicken</b></div>
-      <select class="size-select">
-        <option value="1kg" data-price="900">1kg - ₹900</option>
-        <option value="500gms" data-price="450">500gms - ₹450</option>
-        <option value="250gms" data-price="230">250gms - ₹230</option>
-      </select>
-      <input type="number" class="quantity-input" value="0" min="0">
-    </div>
+  <div class="pickle-item">
+    <label>
+      <input type="checkbox" name="items" value="Chicken Pickle"> Chicken Pickle
+    </label>
   </div>
 
-  <div class="total">Total: ₹<span id="totalPrice">0</span></div>
+  <div class="pickle-item">
+    <label>
+      <input type="checkbox" name="items" value="Prawn Pickle"> Prawn Pickle
+    </label>
+  </div>
+
   <button type="submit">Place Order</button>
+
 </form>
 
+<!-- ✅ FULL SCRIPT -->
 <script>
-const form = document.getElementById("orderForm");
-const totalPriceEl = document.getElementById("totalPrice");
+const form = document.querySelector("form");
+const submitBtn = document.querySelector("button");
+const phoneInput = document.getElementById("phone");
 
-function calculateTotal() {
-  let total = 0;
-  document.querySelectorAll(".pickle-item").forEach(item => {
-    const qty = parseInt(item.querySelector(".quantity-input").value) || 0;
-    const price = parseInt(item.querySelector(".size-select").selectedOptions[0].dataset.price);
-    total += qty * price;
-  });
-  totalPriceEl.innerText = total;
-  return total;
-}
+/* ================= PHONE INPUT CONTROL ================= */
+phoneInput.addEventListener("input", function () {
+  // Remove non-numeric characters
+  this.value = this.value.replace(/[^0-9]/g, "");
 
-document.querySelectorAll(".quantity-input, .size-select").forEach(el => {
-  el.addEventListener("input", calculateTotal);
-  el.addEventListener("change", calculateTotal);
+  // Limit to 10 digits
+  if (this.value.length > 10) {
+    this.value = this.value.slice(0, 10);
+  }
 });
 
-form.addEventListener("submit", function(e){
+/* ================= FORM SUBMIT ================= */
+form.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
-  const address = document.getElementById("address").value.trim();
-  const state = document.getElementById("state").value.trim();
-  const pincode = document.getElementById("pincode").value.trim();
+  const phone = phoneInput.value.trim();
 
-  const items = [];
-  document.querySelectorAll(".pickle-item").forEach(item => {
-    const itemName = item.dataset.name;
-    const size = item.querySelector(".size-select").value;
-    const price = parseInt(item.querySelector(".size-select").selectedOptions[0].dataset.price);
-    const quantity = parseInt(item.querySelector(".quantity-input").value) || 0;
-    if(quantity > 0) {
-      items.push({
-        name: itemName,
-        size: size,
-        quantity: quantity,
-        total: quantity * price
-      });
-    }
-  });
-
-  if(!name || !phone || !address || !state || !pincode || items.length === 0){
-    alert("All fields are required and select at least one pickle.");
+  // ✅ Validation
+  if (phone.length !== 10) {
+    alert("Please enter a valid 10-digit mobile number");
+    phoneInput.focus();
     return;
   }
 
-  const totalPrice = items.reduce((acc, i) => acc + i.total, 0);
+  // ✅ Button UX
+  submitBtn.innerText = "Placing Order...";
+  submitBtn.disabled = true;
 
-  fetch("/order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, phone, address, state, pincode, items: JSON.stringify(items), totalPrice })
-  })
-  .then(res => res.text())
-  .then(data => {
-    document.body.innerHTML = data;
-  })
-  .catch(err => console.error(err));
+  form.submit();
 });
 </script>
 
