@@ -30,18 +30,25 @@ app.post("/order", async (req, res) => {
   try {
     const { name, phone, address, state, pincode, totalPrice, items } = req.body;
 
-    if (!name || !phone || !address || !state || !pincode || !totalPrice || !items) {
+    // ✅ Required validation
+    if (!name || !phone || !address || !state || !pincode || !items) {
       return res.send("All fields are required.");
     }
 
-    // ✅ Phone validation
+    // ✅ Phone validation (10 digits only)
     if (!/^\d{10}$/.test(phone)) {
-      return res.send("Invalid phone number.");
+      return res.send("Invalid phone number. Enter 10 digits only.");
     }
 
-    let parsedItems = typeof items === "string" ? JSON.parse(items) : items;
+    let parsedItems;
 
-    if (!parsedItems.length) {
+    try {
+      parsedItems = typeof items === "string" ? JSON.parse(items) : items;
+    } catch {
+      parsedItems = items;
+    }
+
+    if (!parsedItems || parsedItems.length === 0) {
       return res.send("No items selected.");
     }
 
@@ -55,7 +62,7 @@ app.post("/order", async (req, res) => {
       address,
       state,
       pincode,
-      totalPrice,
+      totalPrice: totalPrice || 0,
       items: parsedItems,
       date: new Date().toLocaleString(),
     };
@@ -63,11 +70,17 @@ app.post("/order", async (req, res) => {
     data.orders.push(order);
     fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
+    // ✅ Prepare email text
     let itemText = "";
     parsedItems.forEach((item, index) => {
-      itemText += `${index + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}\n`;
+      if (typeof item === "object") {
+        itemText += `${index + 1}. ${item.name} - ${item.size || ""} x ${item.quantity || 1} = ₹${item.total || ""}\n`;
+      } else {
+        itemText += `${index + 1}. ${item}\n`;
+      }
     });
 
+    // ✅ Send email
     await resend.emails.send({
       from: `${BRAND} <onboarding@resend.dev>`,
       to: process.env.EMAIL_USER,
@@ -83,7 +96,7 @@ Address: ${address}, ${state} - ${pincode}
 Items Ordered:
 ${itemText}
 
-Total Price: ₹${totalPrice}
+Total Price: ₹${totalPrice || 0}
 
 Owner: ${OWNER}
 Contact: ${CONTACT}
@@ -101,12 +114,13 @@ Contact: ${CONTACT}
 /* ================= SUCCESS PAGE ================= */
 app.get("/success", (req, res) => {
   const orderId = req.query.id;
+
   res.send(`
     <div style="text-align:center; padding:40px;">
       <h2>✅ Order Placed Successfully!</h2>
       <p><b>Thank you for ordering from ${BRAND}!</b></p>
-      <p>We will contact you over WhatsApp or call for payment details.</p>
-      <p>Order will be delivered within 4 to 5 days.</p>
+      <p>We will contact you shortly for confirmation.</p>
+      <p>Delivery within 4–5 days.</p>
       <br>
       <a href="/invoice/${orderId}">
         <button style="padding:10px 20px;">Download Invoice</button>
@@ -151,7 +165,11 @@ app.get("/invoice/:id", (req, res) => {
 
   doc.text("Items Ordered:");
   order.items.forEach((item, i) => {
-    doc.text(`${i + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}`);
+    if (typeof item === "object") {
+      doc.text(`${i + 1}. ${item.name} - ${item.size || ""} x ${item.quantity || 1} = ₹${item.total || ""}`);
+    } else {
+      doc.text(`${i + 1}. ${item}`);
+    }
   });
 
   doc.moveDown();
@@ -171,7 +189,6 @@ app.get("/invoice/:id", (req, res) => {
 app.get("/admin", (req, res) => {
   const key = req.query.key;
 
-  // ✅ using existing env (no new addition)
   if (key !== process.env.ADMIN_KEY) {
     return res.status(403).send("Unauthorized Access");
   }
@@ -206,6 +223,7 @@ app.get("/admin", (req, res) => {
   `);
 });
 
+/* ================= START SERVER ================= */
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port " + PORT);
 });
