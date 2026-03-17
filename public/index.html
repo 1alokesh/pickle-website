@@ -41,7 +41,15 @@ form.addEventListener("submit", function(e){
 <form id="orderForm">
   <div class="customer-details">
     <input type="text" id="name" placeholder="Your Name" required>
-    <input type="text" id="phone" placeholder="Phone Number" required>
+    <input 
+    type="tel" 
+    id="phone" 
+    name="phone" 
+    required 
+    maxlength="10" 
+    pattern="[0-9]{10}" 
+    placeholder="Enter 10-digit mobile number"
+  >
     <input type="text" id="address" placeholder="Address" required>
     <input type="text" id="state" placeholder="State" required>
     <input type="text" id="pincode" placeholder="Pincode" required>
@@ -93,7 +101,20 @@ form.addEventListener("submit", function(e){
 <script>
 const form = document.getElementById("orderForm");
 const totalPriceEl = document.getElementById("totalPrice");
+const phoneInput = document.getElementById("phone");
 
+/* ================= PHONE INPUT CONTROL ================= */
+phoneInput.addEventListener("input", function () {
+  // Allow only numbers
+  this.value = this.value.replace(/[^0-9]/g, "");
+
+  // Limit to 10 digits
+  if (this.value.length > 10) {
+    this.value = this.value.slice(0, 10);
+  }
+});
+
+/* ================= TOTAL CALCULATION ================= */
 function calculateTotal() {
   let total = 0;
   document.querySelectorAll(".pickle-item").forEach(item => {
@@ -110,11 +131,12 @@ document.querySelectorAll(".quantity-input, .size-select").forEach(el => {
   el.addEventListener("change", calculateTotal);
 });
 
+/* ================= FORM SUBMIT ================= */
 form.addEventListener("submit", function(e){
   e.preventDefault();
 
   const name = document.getElementById("name").value.trim();
-  const phone = document.getElementById("phone").value.trim();
+  const phone = phoneInput.value.trim();
   const address = document.getElementById("address").value.trim();
   const state = document.getElementById("state").value.trim();
   const pincode = document.getElementById("pincode").value.trim();
@@ -125,6 +147,7 @@ form.addEventListener("submit", function(e){
     const size = item.querySelector(".size-select").value;
     const price = parseInt(item.querySelector(".size-select").selectedOptions[0].dataset.price);
     const quantity = parseInt(item.querySelector(".quantity-input").value) || 0;
+
     if(quantity > 0) {
       items.push({
         name: itemName,
@@ -135,25 +158,50 @@ form.addEventListener("submit", function(e){
     }
   });
 
+  // ✅ FIELD VALIDATION
   if(!name || !phone || !address || !state || !pincode || items.length === 0){
     alert("All fields are required and select at least one pickle.");
     return;
   }
 
+  // ✅ PHONE VALIDATION (NEW)
+  if(phone.length !== 10){
+    alert("Please enter a valid 10-digit mobile number");
+    phoneInput.focus();
+    return;
+  }
+
   const totalPrice = items.reduce((acc, i) => acc + i.total, 0);
+
+  // ✅ BUTTON LOADING UX (NEW)
+  const submitBtn = form.querySelector("button");
+  submitBtn.innerText = "Placing Order...";
+  submitBtn.disabled = true;
 
   fetch("/order", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, phone, address, state, pincode, items: JSON.stringify(items), totalPrice })
+    body: JSON.stringify({
+      name,
+      phone,
+      address,
+      state,
+      pincode,
+      items: JSON.stringify(items),
+      totalPrice
+    })
   })
   .then(res => res.text())
   .then(data => {
     document.body.innerHTML = data;
   })
-  .catch(err => console.error(err));
+  .catch(err => {
+    console.error(err);
+    alert("Something went wrong. Please try again.");
+    submitBtn.disabled = false;
+    submitBtn.innerText = "Place Order";
+  });
 });
 </script>
-
 </body>
 </html>
