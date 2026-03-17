@@ -57,10 +57,22 @@ form.addEventListener("submit", function(e){
 
   <h2>Select Your Pickles</h2>
   <div class="pickles">
-    <!-- Mango Pickle -->
-    <div class="pickle-item" data-name="Mango Pickle">
-      <img src="images/mango.jpg" alt="Mango Pickle">
-      <div><b>Mango Pickle</b></div>
+    <!-- Mirchi Pickle -->
+    <div class="pickle-item" data-name="Guntur Mirchi Pickle">
+      <img src="images/mango.jpg" alt="Guntur Mirchi Pickle">
+      <div><b>Guntur Mirchi Pickle</b></div>
+      <select class="size-select">
+        <option value="1kg" data-price="320">1kg - ₹320</option>
+        <option value="500gms" data-price="160">500gms - ₹160</option>
+        <option value="250gms" data-price="80">250gms - ₹80</option>
+      </select>
+      <input type="number" class="quantity-input" value="0" min="0">
+    </div>
+    <div class="pickles">
+    <!-- Tomato Pickle -->
+    <div class="pickle-item" data-name="Tomato Pickle">
+      <img src="images/mango.jpg" alt="Tomato Pickle">
+      <div><b>Tomato Pickle</b></div>
       <select class="size-select">
         <option value="1kg" data-price="320">1kg - ₹320</option>
         <option value="500gms" data-price="160">500gms - ₹160</option>
