@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const { Resend } = require("resend");
 const express = require("express");
 const path = require("path");
@@ -9,8 +11,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// ✅ CONSTANTS
+const BRAND = "Guntur Inti Ruchulu";
+const OWNER = "Padma";
+const CONTACT = "9121991628";
+
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json()); // for JSON posts
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Ensure db.json exists
@@ -23,21 +30,19 @@ app.post("/order", async (req, res) => {
   try {
     const { name, phone, address, state, pincode, totalPrice, items } = req.body;
 
-    // Check required fields
     if (!name || !phone || !address || !state || !pincode || !totalPrice || !items) {
       return res.send("All fields are required.");
     }
 
-    // Parse items JSON if string
-    let parsedItems = [];
-    if (typeof items === "string") {
-      try {
-        parsedItems = JSON.parse(items);
-      } catch {
-        return res.send("Items format invalid.");
-      }
-    } else {
-      parsedItems = items;
+    // ✅ Phone validation
+    if (!/^\d{10}$/.test(phone)) {
+      return res.send("Invalid phone number.");
+    }
+
+    let parsedItems = typeof items === "string" ? JSON.parse(items) : items;
+
+    if (!parsedItems.length) {
+      return res.send("No items selected.");
     }
 
     const data = JSON.parse(fs.readFileSync("db.json"));
@@ -58,17 +63,15 @@ app.post("/order", async (req, res) => {
     data.orders.push(order);
     fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
-    // Format items for email
     let itemText = "";
     parsedItems.forEach((item, index) => {
       itemText += `${index + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}\n`;
     });
 
-    // Send Owner Email
     await resend.emails.send({
-      from: "Guntur Inti Ruchulu <onboarding@resend.dev>",
+      from: `${BRAND} <onboarding@resend.dev>`,
       to: process.env.EMAIL_USER,
-      subject: "New Order - Guntur Inti Ruchulu",
+      subject: `New Order - ${BRAND}`,
       text: `
 New Order Received
 
@@ -82,12 +85,11 @@ ${itemText}
 
 Total Price: ₹${totalPrice}
 
-Owner: Padma
-Contact: 9121991628
+Owner: ${OWNER}
+Contact: ${CONTACT}
       `,
     });
 
-    // Redirect to success page
     res.redirect(`/success?id=${orderId}`);
 
   } catch (err) {
@@ -100,20 +102,22 @@ Contact: 9121991628
 app.get("/success", (req, res) => {
   const orderId = req.query.id;
   res.send(`
-    <h2>✅ Order Placed Successfully!</h2>
-    <p><b>Thank you for ordering from Guntur Inti Ruchulu!</b></p>
-    <p>We will contact you over WhatsApp or call for payment details.</p>
-    <p>Order will be delivered within 4 to 5 days.</p>
-    <br>
-    <a href="/invoice/${orderId}">
-      <button style="padding:10px 20px;">Download Invoice</button>
-    </a>
-    <br><br>
-    <a href="/">Back to Home</a>
+    <div style="text-align:center; padding:40px;">
+      <h2>✅ Order Placed Successfully!</h2>
+      <p><b>Thank you for ordering from ${BRAND}!</b></p>
+      <p>We will contact you over WhatsApp or call for payment details.</p>
+      <p>Order will be delivered within 4 to 5 days.</p>
+      <br>
+      <a href="/invoice/${orderId}">
+        <button style="padding:10px 20px;">Download Invoice</button>
+      </a>
+      <br><br>
+      <a href="/">Back to Home</a>
+    </div>
   `);
 });
 
-/* ================= INVOICE PDF ================= */
+/* ================= INVOICE ================= */
 app.get("/invoice/:id", (req, res) => {
   const orderId = req.params.id;
   const data = JSON.parse(fs.readFileSync("db.json"));
@@ -126,15 +130,15 @@ app.get("/invoice/:id", (req, res) => {
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=Guntur_Inti_Ruchulu_Invoice_${order.id}.pdf`
+    `attachment; filename=${BRAND}_Invoice_${order.id}.pdf`
   );
 
   doc.pipe(res);
 
-  doc.fontSize(20).text("Guntur Inti Ruchulu Pickles", { align: "center" });
+  doc.fontSize(20).text(BRAND, { align: "center" });
   doc.moveDown();
 
-  doc.fontSize(14).text("Order Invoice");
+  doc.text("Order Invoice");
   doc.moveDown();
 
   doc.text(`Order ID: ${order.id}`);
@@ -146,28 +150,32 @@ app.get("/invoice/:id", (req, res) => {
   doc.moveDown();
 
   doc.text("Items Ordered:");
-  doc.moveDown();
-  order.items.forEach((item, index) => {
-    doc.text(`${index + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}`);
+  order.items.forEach((item, i) => {
+    doc.text(`${i + 1}. ${item.name} - ${item.size} x ${item.quantity} = ₹${item.total}`);
   });
 
   doc.moveDown();
   doc.text(`Total Amount: ₹${order.totalPrice}`);
   doc.moveDown();
 
-  doc.text("Owner: Padma");
-  doc.text("Contact: 9121991628");
+  doc.text(`Owner: ${OWNER}`);
+  doc.text(`Contact: ${CONTACT}`);
   doc.moveDown();
 
-  doc.text("Thank you for ordering from Guntur Inti Ruchulu!");
-  doc.text("We will contact you over WhatsApp or call for payment details.");
-  doc.text("Order will be delivered within 4 to 5 days.");
+  doc.text(`Thank you for ordering from ${BRAND}!`);
 
   doc.end();
 });
 
-/* ================= ADMIN PAGE ================= */
+/* ================= ADMIN ================= */
 app.get("/admin", (req, res) => {
+  const key = req.query.key;
+
+  // ✅ using existing env (no new addition)
+  if (key !== process.env.ADMIN_KEY) {
+    return res.status(403).send("Unauthorized Access");
+  }
+
   const data = JSON.parse(fs.readFileSync("db.json"));
   const orders = data.orders;
 
@@ -183,7 +191,7 @@ app.get("/admin", (req, res) => {
   `).join("");
 
   res.send(`
-    <h1>Guntur Inti Ruchulu - Orders</h1>
+    <h1>${BRAND} - Orders</h1>
     <table border="1" cellpadding="10">
       <tr>
         <th>#</th>
@@ -198,7 +206,6 @@ app.get("/admin", (req, res) => {
   `);
 });
 
-/* ================= START SERVER ================= */
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port " + PORT);
 });
