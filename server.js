@@ -66,9 +66,9 @@ app.post("/order", async (req, res) => {
 
     // Send Owner Email
     await resend.emails.send({
-      from: "Mana Inti Ruchulu <onboarding@resend.dev>",
+      from: "Guntur Inti Ruchulu <onboarding@resend.dev>",
       to: process.env.EMAIL_USER,
-      subject: "New Order - Mana Inti Ruchulu",
+      subject: "New Order - Guntur Inti Ruchulu",
       text: `
 New Order Received
 
@@ -101,7 +101,7 @@ app.get("/success", (req, res) => {
   const orderId = req.query.id;
   res.send(`
     <h2>✅ Order Placed Successfully!</h2>
-    <p><b>Thank you for ordering from Mana Inti Ruchulu!</b></p>
+    <p><b>Thank you for ordering from Guntur Inti Ruchulu!</b></p>
     <p>We will contact you over WhatsApp or call for payment details.</p>
     <p>Order will be delivered within 4 to 5 days.</p>
     <br>
@@ -126,12 +126,12 @@ app.get("/invoice/:id", (req, res) => {
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader(
     "Content-Disposition",
-    `attachment; filename=Mana_Inti_Ruchulu_Invoice_${order.id}.pdf`
+    `attachment; filename=Guntur_Inti_Ruchulu_Invoice_${order.id}.pdf`
   );
 
   doc.pipe(res);
 
-  doc.fontSize(20).text("Mana Inti Ruchulu Pickles", { align: "center" });
+  doc.fontSize(20).text("Guntur Inti Ruchulu Pickles", { align: "center" });
   doc.moveDown();
 
   doc.fontSize(14).text("Order Invoice");
@@ -159,7 +159,7 @@ app.get("/invoice/:id", (req, res) => {
   doc.text("Contact: 9121991628");
   doc.moveDown();
 
-  doc.text("Thank you for ordering from Mana Inti Ruchulu!");
+  doc.text("Thank you for ordering from Guntur Inti Ruchulu!");
   doc.text("We will contact you over WhatsApp or call for payment details.");
   doc.text("Order will be delivered within 4 to 5 days.");
 
@@ -183,7 +183,7 @@ app.get("/admin", (req, res) => {
   `).join("");
 
   res.send(`
-    <h1>Mana Inti Ruchulu - Orders</h1>
+    <h1>Guntur Inti Ruchulu - Orders</h1>
     <table border="1" cellpadding="10">
       <tr>
         <th>#</th>
