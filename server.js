@@ -11,7 +11,6 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// CONSTANTS
 const BRAND = "Guntur Inti Ruchulu";
 const OWNER = "Padma";
 const CONTACT = "9121991628";
@@ -20,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Ensure DB exists
+// Ensure DB
 if (!fs.existsSync("db.json")) {
   fs.writeFileSync("db.json", JSON.stringify({ orders: [] }, null, 2));
 }
@@ -28,27 +27,52 @@ if (!fs.existsSync("db.json")) {
 /* ================= ORDER ================= */
 app.post("/order", async (req, res) => {
   try {
-    const { name, phone, address, state, pincode, totalPrice, items } = req.body;
+    let { name, phone, address, state, pincode, totalPrice, items } = req.body;
 
-    // ✅ FIXED VALIDATION
-    if (!name || !phone || !address || !state || !pincode) {
+    // 🔥 TRIM ALL INPUTS (IMPORTANT FIX)
+    name = name?.toString().trim();
+    phone = phone?.toString().trim();
+    address = address?.toString().trim();
+    state = state?.toString().trim();
+    pincode = pincode?.toString().trim();
+
+    // 🔥 SAFE VALIDATION
+    if (
+      !name ||
+      !phone ||
+      !address ||
+      !state ||
+      !pincode ||
+      name.length === 0 ||
+      phone.length === 0 ||
+      address.length === 0 ||
+      state.length === 0 ||
+      pincode.length === 0
+    ) {
+      console.log("❌ Missing fields:", req.body);
       return res.send("All fields are required.");
     }
 
+    // PHONE CHECK
     if (!/^\d{10}$/.test(phone)) {
       return res.send("Invalid phone number.");
     }
 
-    // ✅ SAFE ITEMS PARSE
+    // 🔥 SAFE ITEMS PARSE (CRITICAL FIX)
     let parsedItems = [];
 
-    try {
-      parsedItems = Array.isArray(items) ? items : JSON.parse(items);
-    } catch (e) {
-      console.error("Parse error:", e);
+    if (Array.isArray(items)) {
+      parsedItems = items;
+    } else if (typeof items === "string") {
+      try {
+        parsedItems = JSON.parse(items);
+      } catch (e) {
+        console.log("Parse error:", e);
+      }
     }
 
     if (!parsedItems || parsedItems.length === 0) {
+      console.log("❌ Items issue:", items);
       return res.send("No items selected.");
     }
 
@@ -71,7 +95,7 @@ app.post("/order", async (req, res) => {
     data.orders.push(order);
     fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
-    // ✅ EMAIL FORMAT
+    // EMAIL TEXT
     let itemText = "";
     parsedItems.forEach((item, index) => {
       const qty = item.quantity || 1;
@@ -107,7 +131,7 @@ Contact: ${CONTACT}
     res.redirect(`/success?id=${orderId}`);
 
   } catch (err) {
-    console.error(err);
+    console.error("🔥 ERROR:", err);
     res.status(500).send("Something went wrong.");
   }
 });
@@ -125,7 +149,7 @@ app.get("/success", (req, res) => {
 
       <br>
       <a href="/invoice/${orderId}">
-        <button style="padding:10px 20px;">Download Invoice</button>
+        <button>Download Invoice</button>
       </a>
 
       <br><br>
@@ -136,9 +160,8 @@ app.get("/success", (req, res) => {
 
 /* ================= INVOICE ================= */
 app.get("/invoice/:id", (req, res) => {
-  const orderId = req.params.id;
   const data = JSON.parse(fs.readFileSync("db.json"));
-  const order = data.orders.find(o => o.id == orderId);
+  const order = data.orders.find(o => o.id == req.params.id);
 
   if (!order) return res.send("Order not found.");
 
@@ -155,76 +178,26 @@ app.get("/invoice/:id", (req, res) => {
   doc.fontSize(20).text(BRAND, { align: "center" });
   doc.moveDown();
 
-  doc.text("Order Invoice");
-  doc.moveDown();
-
   doc.text(`Order ID: ${order.id}`);
-  doc.text(`Customer Name: ${order.name}`);
+  doc.text(`Name: ${order.name}`);
   doc.text(`Phone: ${order.phone}`);
-  doc.text(`Address: ${order.address}`);
-  doc.text(`State: ${order.state}`);
-  doc.text(`Pincode: ${order.pincode}`);
+  doc.text(`Address: ${order.address}, ${order.state} - ${order.pincode}`);
   doc.moveDown();
 
-  doc.text("Items Ordered:");
+  doc.text("Items:");
 
   order.items.forEach((item, i) => {
     const qty = item.quantity || 1;
     const price = item.price || 0;
     const total = item.total || (qty * price);
 
-    doc.text(`${i + 1}. ${item.name} - ${item.size || ""} x ${qty} = ₹${total}`);
+    doc.text(`${i + 1}. ${item.name} (${item.size}) x ${qty} = ₹${total}`);
   });
 
   doc.moveDown();
-  doc.text(`Total Amount: ₹${order.totalPrice}`);
-  doc.moveDown();
-
-  doc.text(`Owner: ${OWNER}`);
-  doc.text(`Contact: ${CONTACT}`);
-  doc.moveDown();
-
-  doc.text(`Thank you for ordering from ${BRAND}!`);
+  doc.text(`Total: ₹${order.totalPrice}`);
 
   doc.end();
-});
-
-/* ================= ADMIN ================= */
-app.get("/admin", (req, res) => {
-  const key = req.query.key;
-
-  if (key !== process.env.ADMIN_KEY) {
-    return res.status(403).send("Unauthorized");
-  }
-
-  const data = JSON.parse(fs.readFileSync("db.json"));
-  const orders = data.orders;
-
-  let rows = orders.map((o, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td>${o.id}</td>
-      <td>${o.name}</td>
-      <td>${o.phone}</td>
-      <td>₹${o.totalPrice}</td>
-      <td>${o.date}</td>
-    </tr>
-  `).join("");
-
-  res.send(`
-    <h1>${BRAND} Orders</h1>
-    <table border="1" cellpadding="10">
-      <tr>
-        <th>#</th>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>Total</th>
-        <th>Date</th>
-      </tr>
-      ${rows}
-    </table>
-  `);
 });
 
 /* ================= START ================= */
