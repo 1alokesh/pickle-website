@@ -172,7 +172,11 @@ app.get("/invoice/:id", (req, res) => {
   doc.text("Items Ordered:");
   order.items.forEach((item, i) => {
     if (typeof item === "object") {
-      doc.text(`${i + 1}. ${item.name} - ${item.size || ""} x ${item.quantity || 1} = ₹${item.total || ""}`);
+     const qty = item.quantity || 1;
+const price = item.price || 0;
+const total = item.total || (qty * price);
+
+doc.text(`${i + 1}. ${item.name} - ${item.size || ""} x ${qty} = ₹${total}`);
     } else {
       doc.text(`${i + 1}. ${item}`);
     }
