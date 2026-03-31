@@ -42,7 +42,8 @@ cart.forEach(item => {
     <div class="cart-card">
       <p><b>${item.name}</b></p>
       <p>${item.size}</p>
-      <p>₹${item.price}</p>
+      <p>Qty: ${item.quantity}</p>
+      <p><b>₹${item.total}</b></p>
     </div>
   `;
 });
@@ -75,7 +76,8 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
   .then(data => {
     document.body.innerHTML = data;
     localStorage.removeItem("cart");
-  });
+  })
+  .catch(() => alert("Order failed"));
 });
 </script>
 
