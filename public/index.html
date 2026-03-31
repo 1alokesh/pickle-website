@@ -1,63 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Guntur Inti Ruchulu</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guntur Inti Ruchulu</title>
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
-  <h2>🌶️ Guntur Inti Ruchulu</h2>
+  <h2>🌶️ Pickles</h2>
   <button onclick="goToCart()">🛒</button>
 </div>
 
-<!-- HERO -->
 <div class="hero">
   <h3>Authentic Homemade Pickles</h3>
-  <p>Fresh | Spicy | Traditional</p>
 </div>
 
-<!-- PRODUCTS -->
-<div class="products" id="productList"></div>
+<div id="productList" class="products"></div>
+<div id="cartBar" class="cart-bar"></div>
 
 <script src="products.js"></script>
 <script src="cart.js"></script>
 
 <script>
-function renderProducts() {
-  const container = document.getElementById("productList");
-  container.innerHTML = "";
+function renderProducts(){
+  const c=document.getElementById("productList");
+  c.innerHTML="";
 
-  products.forEach(p => {
-    let variantButtons = "";
+  products.forEach(p=>{
+    c.innerHTML+=`
+    <div class="card">
+      <img src="${p.image}">
+      <h3>${p.name}</h3>
 
-    p.variants.forEach((v, i) => {
-      variantButtons += `
-        <button onclick="addToCart(${p.id}, ${i})">
-          ${v.size} - ₹${v.price}
-        </button>
-      `;
-    });
-
-    container.innerHTML += `
-      <div class="card">
-        <img src="${p.image}">
-        <h3>${p.name}</h3>
-        <div class="variants">
-          ${variantButtons}
+      ${p.variants.map((v,i)=>`
+        <div class="variant-row">
+          <span>${v.size} - ₹${v.price}</span>
+          <button onclick="addToCart(${p.id},${i})">ADD</button>
         </div>
-      </div>
-    `;
+      `).join("")}
+
+    </div>`;
   });
-}
 
-function goToCart(){
-  window.location.href = "cart.html";
+  updateCartBar();
 }
-
 renderProducts();
 </script>
 
