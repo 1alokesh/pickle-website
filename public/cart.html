@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cart</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Your Cart</h2>
+<div id="cartItems"></div>
+<h3>Total: ₹<span id="total"></span></h3>
+
+<form id="checkoutForm">
+  <input placeholder="Name" id="name" required>
+  <input placeholder="Phone" id="phone" required>
+  <input placeholder="Address" id="address" required>
+  <button type="submit">Place Order</button>
+</form>
+
+<script src="cart.js"></script>
+
+<script>
+const cartItemsDiv = document.getElementById("cartItems");
+
+cart.forEach(item => {
+  cartItemsDiv.innerHTML += `
+    <p>${item.name} (${item.size}) - ₹${item.price}</p>
+  `;
+});
+
+document.getElementById("total").innerText = getCartTotal();
+
+document.getElementById("checkoutForm").addEventListener("submit", function(e){
+  e.preventDefault();
+
+  fetch("/order", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: document.getElementById("name").value,
+      phone: document.getElementById("phone").value,
+      address: document.getElementById("address").value,
+      state: "AP",
+      pincode: "000000",
+      items: cart,
+      totalPrice: getCartTotal()
+    })
+  })
+  .then(res => res.text())
+  .then(data => {
+    document.body.innerHTML = data;
+    localStorage.removeItem("cart");
+  });
+});
+</script>
+
+</body>
+</html>
