@@ -1,7 +1,12 @@
+/* GLOBAL */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   background: #fff7f0;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 /* HEADER */
@@ -12,8 +17,14 @@ body {
   color: white;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 12px 15px;
   z-index: 100;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 18px;
 }
 
 .header button {
@@ -23,6 +34,8 @@ body {
   width: 40px;
   height: 40px;
   font-size: 18px;
+  border: none;
+  cursor: pointer;
 }
 
 /* HERO */
@@ -36,7 +49,7 @@ body {
   margin: 0;
 }
 
-/* PRODUCTS GRID (PHONE FIRST) */
+/* PRODUCTS GRID (MOBILE FIRST) */
 .products {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -44,13 +57,18 @@ body {
   padding: 10px;
 }
 
-/* CARD */
+/* PRODUCT CARD */
 .card {
   background: white;
   border-radius: 12px;
   padding: 10px;
   text-align: center;
   box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  transition: 0.2s;
+}
+
+.card:active {
+  transform: scale(0.97);
 }
 
 .card img {
@@ -63,23 +81,86 @@ body {
 .card h3 {
   font-size: 14px;
   margin: 8px 0;
+  min-height: 32px;
 }
 
 /* VARIANT BUTTONS */
 .variants button {
   width: 100%;
   margin-top: 5px;
-  padding: 6px;
-  font-size: 12px;
-  border-radius: 6px;
+  padding: 8px;
+  font-size: 13px;
+  border-radius: 8px;
   border: none;
   background: #b71c1c;
   color: white;
+  cursor: pointer;
+}
+
+.variants button:active {
+  background: #e53935;
+}
+
+/* CONTAINER (FOR CART PAGE) */
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 10px;
+}
+
+/* CART ITEMS */
+.cart-items {
+  margin-top: 10px;
+}
+
+/* CART CARD */
+.cart-card {
+  background: white;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* TOTAL */
+.total {
+  text-align: center;
+  margin: 15px 0;
+}
+
+/* FORM */
+.form input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* BUTTON (GLOBAL) */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #b71c1c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* BUTTON ACTIVE */
+button:active {
+  background: #e53935;
 }
 
 /* DESKTOP VIEW */
 @media(min-width: 768px){
   .products {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .container {
+    max-width: 900px;
   }
 }
