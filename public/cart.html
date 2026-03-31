@@ -1,100 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Checkout - Guntur Inti Ruchulu</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<!-- HEADER -->
 <div class="header">
-  <h2>🛒 Checkout</h2>
-  <button onclick="goBack()">←</button>
+  <h2>Checkout</h2>
+  <button onclick="history.back()">←</button>
 </div>
 
 <div class="container">
 
-  <!-- CART ITEMS -->
-  <div id="cartItems" class="cart-items"></div>
+<div id="cartItems"></div>
+<h3>Total: ₹<span id="total"></span></h3>
 
-  <!-- TOTAL -->
-  <h3 class="total">Total: ₹<span id="total"></span></h3>
-
-  <!-- FORM -->
-  <form id="checkoutForm" class="form">
-    <input placeholder="Full Name" id="name" required>
-
-    <input 
-      placeholder="Mobile Number" 
-      id="phone" 
-      required 
-      maxlength="10"
-      pattern="[0-9]{10}"
-    >
-
-    <input placeholder="Address" id="address" required>
-    <input placeholder="State" id="state" required>
-    <input placeholder="Pincode" id="pincode" required>
-
-    <button type="submit">Place Order</button>
-  </form>
+<form id="f">
+<input id="name" placeholder="Name" required>
+<input id="phone" placeholder="Phone" required maxlength="10">
+<input id="address" placeholder="Address" required>
+<input id="state" placeholder="State" required>
+<input id="pincode" placeholder="Pincode" required>
+<button>Place Order</button>
+</form>
 
 </div>
 
 <script src="cart.js"></script>
 
 <script>
-function goBack(){
-  window.location.href = "/";
+function renderCartItems(){
+  const div=document.getElementById("cartItems");
+  div.innerHTML="";
+
+  cart.forEach((item,i)=>{
+    div.innerHTML+=`
+    <div class="cart-card">
+      <p>${item.name}</p>
+      <p>${item.size}</p>
+
+      <div class="qty-control">
+        <button onclick="decreaseQty(${i})">-</button>
+        <span>${item.quantity}</span>
+        <button onclick="increaseQty(${i})">+</button>
+      </div>
+
+      <p>₹${item.total}</p>
+    </div>`;
+  });
+
+  document.getElementById("total").innerText=getCartTotal();
 }
 
-const cartItemsDiv = document.getElementById("cartItems");
+renderCartItems();
 
-/* SHOW CART */
-cart.forEach(item => {
-  cartItemsDiv.innerHTML += `
-    <div class="cart-card">
-      <p><b>${item.name}</b></p>
-      <p>${item.size}</p>
-      <p>Qty: ${item.quantity}</p>
-      <p><b>₹${item.total}</b></p>
-    </div>
-  `;
+/* PHONE */
+phone.oninput=function(){
+this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);
+};
+
+f.onsubmit=function(e){
+e.preventDefault();
+
+fetch("/order",{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+name:name.value,
+phone:phone.value,
+address:address.value,
+state:state.value,
+pincode:pincode.value,
+items:cart,
+totalPrice:getCartTotal()
+})
+})
+.then(r=>r.text())
+.then(d=>{
+document.body.innerHTML=d;
+localStorage.removeItem("cart");
 });
-
-/* TOTAL */
-document.getElementById("total").innerText = getCartTotal();
-
-/* PHONE VALIDATION */
-document.getElementById("phone").addEventListener("input", function () {
-  this.value = this.value.replace(/[^0-9]/g, "").slice(0,10);
-});
-
-/* SUBMIT */
-document.getElementById("checkoutForm").addEventListener("submit", function(e){
-  e.preventDefault();
-
-  fetch("/order", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({
-      name: document.getElementById("name").value,
-      phone: document.getElementById("phone").value,
-      address: document.getElementById("address").value,
-      state: document.getElementById("state").value,
-      pincode: document.getElementById("pincode").value,
-      items: cart,
-      totalPrice: getCartTotal()
-    })
-  })
-  .then(res => res.text())
-  .then(data => {
-    document.body.innerHTML = data;
-    localStorage.removeItem("cart");
-  })
-  .catch(() => alert("Order failed"));
-});
+};
 </script>
 
 </body>
