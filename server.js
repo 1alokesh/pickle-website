@@ -31,9 +31,13 @@ app.post("/order", async (req, res) => {
     const { name, phone, address, state, pincode, totalPrice, items } = req.body;
 
     // ✅ Required validation
-    if (!name || !phone || !address || !state || !pincode || !items) {
-      return res.send("All fields are required.");
-    }
+    if (!name || !phone || !address || !state || !pincode) {
+  return res.send("All fields are required.");
+}
+
+if (!items || items.length === 0) {
+  return res.send("Please add at least one item.");
+}
 
     // ✅ Phone validation (10 digits only)
     if (!/^\d{10}$/.test(phone)) {
