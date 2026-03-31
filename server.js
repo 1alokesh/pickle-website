@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// ✅ CONSTANTS
+// CONSTANTS
 const BRAND = "Guntur Inti Ruchulu";
 const OWNER = "Padma";
 const CONTACT = "9121991628";
@@ -20,42 +20,39 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Ensure db.json exists
+// Ensure DB exists
 if (!fs.existsSync("db.json")) {
   fs.writeFileSync("db.json", JSON.stringify({ orders: [] }, null, 2));
 }
 
-/* ================= ORDER ROUTE ================= */
+/* ================= ORDER ================= */
 app.post("/order", async (req, res) => {
   try {
     const { name, phone, address, state, pincode, totalPrice, items } = req.body;
 
-    // ✅ Required validation
+    // ✅ FIXED VALIDATION
     if (!name || !phone || !address || !state || !pincode) {
-  return res.send("All fields are required.");
-}
-
-if (!items || items.length === 0) {
-  return res.send("Please add at least one item.");
-}
-
-    // ✅ Phone validation (10 digits only)
-    if (!/^\d{10}$/.test(phone)) {
-      return res.send("Invalid phone number. Enter 10 digits only.");
+      return res.send("All fields are required.");
     }
 
-    let parsedItems;
+    if (!/^\d{10}$/.test(phone)) {
+      return res.send("Invalid phone number.");
+    }
+
+    // ✅ SAFE ITEMS PARSE
+    let parsedItems = [];
 
     try {
-      parsedItems = typeof items === "string" ? JSON.parse(items) : items;
-    } catch {
-      parsedItems = items;
+      parsedItems = Array.isArray(items) ? items : JSON.parse(items);
+    } catch (e) {
+      console.error("Parse error:", e);
     }
 
     if (!parsedItems || parsedItems.length === 0) {
       return res.send("No items selected.");
     }
 
+    // SAVE ORDER
     const data = JSON.parse(fs.readFileSync("db.json"));
     const orderId = Date.now();
 
@@ -74,23 +71,17 @@ if (!items || items.length === 0) {
     data.orders.push(order);
     fs.writeFileSync("db.json", JSON.stringify(data, null, 2));
 
-    // ✅ Prepare email text
+    // ✅ EMAIL FORMAT
     let itemText = "";
     parsedItems.forEach((item, index) => {
-  if (typeof item === "object") {
+      const qty = item.quantity || 1;
+      const price = item.price || 0;
+      const total = item.total || (qty * price);
 
-    const qty = item.quantity || 1;
-    const price = item.price || 0;
-    const total = item.total || (qty * price); // ✅ FIX
+      itemText += `${index + 1}. ${item.name} - ${item.size || ""} x ${qty} = ₹${total}\n`;
+    });
 
-    itemText += `${index + 1}. ${item.name} - ${item.size || ""} x ${qty} = ₹${total}\n`;
-
-  } else {
-    itemText += `${index + 1}. ${item}\n`;
-  }
-});
-
-    // ✅ Send email
+    // SEND EMAIL
     await resend.emails.send({
       from: `${BRAND} <onboarding@resend.dev>`,
       to: process.env.EMAIL_USER,
@@ -121,7 +112,7 @@ Contact: ${CONTACT}
   }
 });
 
-/* ================= SUCCESS PAGE ================= */
+/* ================= SUCCESS ================= */
 app.get("/success", (req, res) => {
   const orderId = req.query.id;
 
@@ -129,12 +120,14 @@ app.get("/success", (req, res) => {
     <div style="text-align:center; padding:40px;">
       <h2>✅ Order Placed Successfully!</h2>
       <p><b>Thank you for ordering from ${BRAND}!</b></p>
-      <p>We will contact you shortly for confirmation.</p>
+      <p>We will contact you shortly.</p>
       <p>Delivery within 4–5 days.</p>
+
       <br>
       <a href="/invoice/${orderId}">
         <button style="padding:10px 20px;">Download Invoice</button>
       </a>
+
       <br><br>
       <a href="/">Back to Home</a>
     </div>
@@ -174,16 +167,13 @@ app.get("/invoice/:id", (req, res) => {
   doc.moveDown();
 
   doc.text("Items Ordered:");
-  order.items.forEach((item, i) => {
-    if (typeof item === "object") {
-     const qty = item.quantity || 1;
-const price = item.price || 0;
-const total = item.total || (qty * price);
 
-doc.text(`${i + 1}. ${item.name} - ${item.size || ""} x ${qty} = ₹${total}`);
-    } else {
-      doc.text(`${i + 1}. ${item}`);
-    }
+  order.items.forEach((item, i) => {
+    const qty = item.quantity || 1;
+    const price = item.price || 0;
+    const total = item.total || (qty * price);
+
+    doc.text(`${i + 1}. ${item.name} - ${item.size || ""} x ${qty} = ₹${total}`);
   });
 
   doc.moveDown();
@@ -204,15 +194,15 @@ app.get("/admin", (req, res) => {
   const key = req.query.key;
 
   if (key !== process.env.ADMIN_KEY) {
-    return res.status(403).send("Unauthorized Access");
+    return res.status(403).send("Unauthorized");
   }
 
   const data = JSON.parse(fs.readFileSync("db.json"));
   const orders = data.orders;
 
-  let rows = orders.map((o, index) => `
+  let rows = orders.map((o, i) => `
     <tr>
-      <td>${index + 1}</td>
+      <td>${i + 1}</td>
       <td>${o.id}</td>
       <td>${o.name}</td>
       <td>${o.phone}</td>
@@ -222,11 +212,11 @@ app.get("/admin", (req, res) => {
   `).join("");
 
   res.send(`
-    <h1>${BRAND} - Orders</h1>
+    <h1>${BRAND} Orders</h1>
     <table border="1" cellpadding="10">
       <tr>
         <th>#</th>
-        <th>Order ID</th>
+        <th>ID</th>
         <th>Name</th>
         <th>Phone</th>
         <th>Total</th>
@@ -237,7 +227,7 @@ app.get("/admin", (req, res) => {
   `);
 });
 
-/* ================= START SERVER ================= */
+/* ================= START ================= */
 app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port " + PORT);
 });
