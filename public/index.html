@@ -2,21 +2,26 @@
 <html>
 <head>
   <title>Guntur Inti Ruchulu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<header class="header">
-  <h1>Guntur Inti Ruchulu</h1>
-  <button onclick="goToCart()">Cart 🛒</button>
-</header>
+<!-- HEADER -->
+<div class="header">
+  <h2>🌶️ Guntur Pickles</h2>
+  <button onclick="goToCart()">🛒</button>
+</div>
 
-<section class="hero">
-  <h2>Authentic Homemade Pickles</h2>
+<!-- HERO -->
+<div class="hero">
+  <h3>Authentic Homemade Pickles</h3>
   <p>Fresh | Spicy | Traditional</p>
-</section>
+</div>
 
-<section class="products" id="productList"></section>
+<!-- PRODUCTS -->
+<div class="products" id="productList"></div>
 
 <script src="products.js"></script>
 <script src="cart.js"></script>
@@ -24,12 +29,13 @@
 <script>
 function renderProducts() {
   const container = document.getElementById("productList");
+  container.innerHTML = "";
 
   products.forEach(p => {
-    let variantsHTML = "";
+    let variantButtons = "";
 
     p.variants.forEach((v, i) => {
-      variantsHTML += `
+      variantButtons += `
         <button onclick="addToCart(${p.id}, ${i})">
           ${v.size} - ₹${v.price}
         </button>
@@ -40,7 +46,9 @@ function renderProducts() {
       <div class="card">
         <img src="${p.image}">
         <h3>${p.name}</h3>
-        <div>${variantsHTML}</div>
+        <div class="variants">
+          ${variantButtons}
+        </div>
       </div>
     `;
   });
