@@ -4,39 +4,47 @@ body {
   background: #fff7f0;
 }
 
-/* CONTAINER */
-.container {
-  max-width: 500px;
-  margin: auto;
-  padding: 15px;
-}
-
 /* HEADER */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  position: sticky;
+  top: 0;
   background: #b71c1c;
   color: white;
-  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 15px;
+  z-index: 100;
+}
+
+.header button {
+  background: white;
+  color: #b71c1c;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
 }
 
 /* HERO */
 .hero {
   text-align: center;
-  padding: 25px;
+  padding: 20px;
   background: #ffe0b2;
 }
 
-/* PRODUCTS GRID */
+.hero h3 {
+  margin: 0;
+}
+
+/* PRODUCTS GRID (PHONE FIRST) */
 .products {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  gap: 10px;
   padding: 10px;
 }
 
-/* PRODUCT CARD */
+/* CARD */
 .card {
   background: white;
   border-radius: 12px;
@@ -47,7 +55,7 @@ body {
 
 .card img {
   width: 100%;
-  height: 140px;
+  height: 130px;
   object-fit: cover;
   border-radius: 10px;
 }
@@ -57,60 +65,21 @@ body {
   margin: 8px 0;
 }
 
-.card button {
+/* VARIANT BUTTONS */
+.variants button {
   width: 100%;
   margin-top: 5px;
   padding: 6px;
   font-size: 12px;
   border-radius: 6px;
-}
-
-/* CART */
-.cart-items {
-  margin: 10px 0;
-}
-
-.cart-card {
-  background: white;
-  padding: 10px;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-/* FORM */
-.form input {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-/* BUTTON */
-button {
-  width: 100%;
-  padding: 12px;
+  border: none;
   background: #b71c1c;
   color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
 }
 
-/* TOTAL */
-.total {
-  text-align: center;
-  margin: 15px 0;
-}
-
-/* DESKTOP RESPONSIVE */
+/* DESKTOP VIEW */
 @media(min-width: 768px){
   .products {
     grid-template-columns: repeat(4, 1fr);
-  }
-
-  .container {
-    max-width: 900px;
   }
 }
