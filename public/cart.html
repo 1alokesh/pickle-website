@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Cart</title>
+  <title>Checkout - Guntur Inti Ruchulu</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h2>Your Cart</h2>
-<div id="cartItems"></div>
-<h3>Total: ₹<span id="total"></span></h3>
+<div class="container">
+  <h2>🛒 Checkout</h2>
 
-<form id="checkoutForm">
-  <input placeholder="Name" id="name" required>
-  <input placeholder="Phone" id="phone" required>
-  <input placeholder="Address" id="address" required>
-  <button type="submit">Place Order</button>
-</form>
+  <div id="cartItems" class="cart-items"></div>
+
+  <h3 class="total">Total: ₹<span id="total"></span></h3>
+
+  <form id="checkoutForm" class="form">
+    <input placeholder="Full Name" id="name" required>
+
+    <input 
+      placeholder="Mobile Number" 
+      id="phone" 
+      required 
+      maxlength="10"
+      pattern="[0-9]{10}"
+    >
+
+    <input placeholder="Address" id="address" required>
+    <input placeholder="State" id="state" required>
+    <input placeholder="Pincode" id="pincode" required>
+
+    <button type="submit">Place Order</button>
+  </form>
+</div>
 
 <script src="cart.js"></script>
 
@@ -24,12 +39,22 @@ const cartItemsDiv = document.getElementById("cartItems");
 
 cart.forEach(item => {
   cartItemsDiv.innerHTML += `
-    <p>${item.name} (${item.size}) - ₹${item.price}</p>
+    <div class="cart-card">
+      <p><b>${item.name}</b></p>
+      <p>${item.size}</p>
+      <p>₹${item.price}</p>
+    </div>
   `;
 });
 
 document.getElementById("total").innerText = getCartTotal();
 
+/* PHONE VALIDATION */
+document.getElementById("phone").addEventListener("input", function () {
+  this.value = this.value.replace(/[^0-9]/g, "").slice(0,10);
+});
+
+/* SUBMIT */
 document.getElementById("checkoutForm").addEventListener("submit", function(e){
   e.preventDefault();
 
@@ -40,8 +65,8 @@ document.getElementById("checkoutForm").addEventListener("submit", function(e){
       name: document.getElementById("name").value,
       phone: document.getElementById("phone").value,
       address: document.getElementById("address").value,
-      state: "AP",
-      pincode: "000000",
+      state: document.getElementById("state").value,
+      pincode: document.getElementById("pincode").value,
       items: cart,
       totalPrice: getCartTotal()
     })
