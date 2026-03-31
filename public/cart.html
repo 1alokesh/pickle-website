@@ -2,17 +2,26 @@
 <html>
 <head>
   <title>Checkout - Guntur Inti Ruchulu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<!-- HEADER -->
+<div class="header">
   <h2>🛒 Checkout</h2>
+  <button onclick="goBack()">←</button>
+</div>
 
+<div class="container">
+
+  <!-- CART ITEMS -->
   <div id="cartItems" class="cart-items"></div>
 
+  <!-- TOTAL -->
   <h3 class="total">Total: ₹<span id="total"></span></h3>
 
+  <!-- FORM -->
   <form id="checkoutForm" class="form">
     <input placeholder="Full Name" id="name" required>
 
@@ -30,13 +39,19 @@
 
     <button type="submit">Place Order</button>
   </form>
+
 </div>
 
 <script src="cart.js"></script>
 
 <script>
+function goBack(){
+  window.location.href = "/";
+}
+
 const cartItemsDiv = document.getElementById("cartItems");
 
+/* SHOW CART */
 cart.forEach(item => {
   cartItemsDiv.innerHTML += `
     <div class="cart-card">
@@ -48,6 +63,7 @@ cart.forEach(item => {
   `;
 });
 
+/* TOTAL */
 document.getElementById("total").innerText = getCartTotal();
 
 /* PHONE VALIDATION */
