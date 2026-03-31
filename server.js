@@ -73,12 +73,18 @@ app.post("/order", async (req, res) => {
     // ✅ Prepare email text
     let itemText = "";
     parsedItems.forEach((item, index) => {
-      if (typeof item === "object") {
-        itemText += `${index + 1}. ${item.name} - ${item.size || ""} x ${item.quantity || 1} = ₹${item.total || ""}\n`;
-      } else {
-        itemText += `${index + 1}. ${item}\n`;
-      }
-    });
+  if (typeof item === "object") {
+
+    const qty = item.quantity || 1;
+    const price = item.price || 0;
+    const total = item.total || (qty * price); // ✅ FIX
+
+    itemText += `${index + 1}. ${item.name} - ${item.size || ""} x ${qty} = ₹${total}\n`;
+
+  } else {
+    itemText += `${index + 1}. ${item}\n`;
+  }
+});
 
     // ✅ Send email
     await resend.emails.send({
