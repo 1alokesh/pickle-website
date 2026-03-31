@@ -27,6 +27,7 @@ if (!fs.existsSync("db.json")) {
 /* ================= ORDER ================= */
 app.post("/order", async (req, res) => {
   try {
+    console.log("BODY:", req.body); 
     let { name, phone, address, state, pincode, totalPrice, items } = req.body;
 
     // 🔥 TRIM ALL INPUTS (IMPORTANT FIX)
