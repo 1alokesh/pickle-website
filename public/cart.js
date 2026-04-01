@@ -71,4 +71,14 @@ function decreaseQty(i) {
   else cart[i].total = cart[i].quantity * cart[i].price;
 
   saveCart();
+showToast("Added to cart 🛒");
+}
+function showToast(msg){
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.style.display = "block";
+
+  setTimeout(()=>{
+    t.style.display = "none";
+  },2000);
 }
