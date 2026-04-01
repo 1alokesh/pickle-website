@@ -12,7 +12,7 @@ const products = [
   },
   {
     id: 2,
-    name: "Chinta Pandu Pachadi",
+    name: "Tamarind Pickle (Chintakaya)",
     category: "veg",
     image: "images/Chinta_Pandu_Pachadi.jpg",
     variants: [
@@ -64,6 +64,28 @@ const products = [
       { size: "500g", price: 159 },
       { size: "1kg", price: 300 }
     ]
-  }
+  },
+ {
+    id: 7,
+    name: "Tomato Pickle",
+    category: "veg",
+    image: "images/tomata.jpg",
+    variants: [
+      { size: "250g", price: 79 },
+      { size: "500g", price: 159 },
+      { size: "1kg", price: 299 }
+    ]
+  },
+  {
+    id: 8,
+    name: "Amla Pickle(Usirikaya)",
+    category: "veg",
+    image: "images/amal.jpg",
+    variants: [
+      { size: "250g", price: 99 },
+      { size: "500g", price: 199 },
+      { size: "1kg", price: 399 }
+    ]
+  } 
 ];
 
