@@ -16,15 +16,17 @@
 <div class="container">
 
 <div id="cartItems"></div>
+
 <h3>Total: ₹<span id="total"></span></h3>
 
 <form id="f">
-<input id="name" placeholder="Name" required>
-<input id="phone" placeholder="Phone" required maxlength="10">
-<input id="address" placeholder="Address" required>
-<input id="state" placeholder="State" required>
-<input id="pincode" placeholder="Pincode" required>
-<button>Place Order</button>
+  <input id="name" placeholder="Full Name" required>
+  <input id="phone" placeholder="Mobile Number" required maxlength="10">
+  <input id="address" placeholder="Address" required>
+  <input id="state" placeholder="State" required>
+  <input id="pincode" placeholder="Pincode" required>
+
+  <button type="submit">Place Order</button>
 </form>
 
 </div>
@@ -33,56 +35,71 @@
 
 <script>
 function renderCartItems(){
-  const div=document.getElementById("cartItems");
-  div.innerHTML="";
+  const div = document.getElementById("cartItems");
+  div.innerHTML = "";
 
-  cart.forEach((item,i)=>{
-    div.innerHTML+=`
-    <div class="cart-card">
-      <p>${item.name}</p>
-      <p>${item.size}</p>
+  if(cart.length === 0){
+    div.innerHTML = "<p style='text-align:center'>Cart is empty 🛒</p>";
+    document.getElementById("total").innerText = 0;
+    return;
+  }
 
-      <div class="qty-control">
-        <button onclick="decreaseQty(${i})">-</button>
-        <span>${item.quantity}</span>
-        <button onclick="increaseQty(${i})">+</button>
+  cart.forEach((item, i) => {
+    div.innerHTML += `
+      <div class="cart-card">
+        <p><b>${item.name}</b></p>
+        <p>${item.size}</p>
+
+        <div class="qty-control">
+          <button onclick="decreaseQty(${i})">-</button>
+          <span>${item.quantity}</span>
+          <button onclick="increaseQty(${i})">+</button>
+        </div>
+
+        <p><b>₹${item.total}</b></p>
       </div>
-
-      <p>₹${item.total}</p>
-    </div>`;
+    `;
   });
 
-  document.getElementById("total").innerText=getCartTotal();
+  document.getElementById("total").innerText = getCartTotal();
 }
 
 renderCartItems();
 
-/* PHONE */
-phone.oninput=function(){
-this.value=this.value.replace(/[^0-9]/g,'').slice(0,10);
+/* PHONE VALIDATION */
+document.getElementById("phone").oninput = function(){
+  this.value = this.value.replace(/[^0-9]/g,'').slice(0,10);
 };
 
-f.onsubmit=function(e){
-e.preventDefault();
+/* ✅ FINAL FIXED SUBMIT */
+document.getElementById("f").onsubmit = function(e){
+  e.preventDefault();
 
-fetch("/order",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-name:name.value,
-phone:phone.value,
-address:address.value,
-state:state.value,
-pincode:pincode.value,
-items:cart,
-totalPrice:getCartTotal()
-})
-})
-.then(r=>r.text())
-.then(d=>{
-document.body.innerHTML=d;
-localStorage.removeItem("cart");
-});
+  const nameVal = document.getElementById("name").value.trim();
+  const phoneVal = document.getElementById("phone").value.trim();
+  const addressVal = document.getElementById("address").value.trim();
+  const stateVal = document.getElementById("state").value.trim();
+  const pincodeVal = document.getElementById("pincode").value.trim();
+
+  fetch("/order", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      name: nameVal,
+      phone: phoneVal,
+      address: addressVal,
+      state: stateVal,
+      pincode: pincodeVal,
+      items: cart,
+      totalPrice: getCartTotal()
+    })
+  })
+  .then(r => r.text())
+  .then(d => {
+    document.body.innerHTML = d;
+    localStorage.removeItem("cart");
+  })
+  .catch(() => alert("Order failed"));
 };
 </script>
 
