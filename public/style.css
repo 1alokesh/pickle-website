@@ -164,3 +164,43 @@ button:active {
     max-width: 900px;
   }
 }
+/* SEARCH */
+.header input{
+  width:120px;
+  padding:5px;
+  border-radius:6px;
+  border:none;
+}
+
+/* DROPDOWN */
+select{
+  width:95%;
+  margin:10px;
+  padding:10px;
+  border-radius:8px;
+}
+
+/* TOAST */
+#toast{
+  position:fixed;
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#333;
+  color:#fff;
+  padding:10px 20px;
+  border-radius:20px;
+  display:none;
+}
+
+/* WHATSAPP */
+.whatsapp{
+  position:fixed;
+  bottom:80px;
+  right:10px;
+  background:#25D366;
+  color:#fff;
+  padding:12px;
+  border-radius:50%;
+  font-size:20px;
+}
