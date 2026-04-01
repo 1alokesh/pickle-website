@@ -220,3 +220,21 @@ select{
   object-fit:contain;
   border-radius:50%;
 }
+.about{
+  padding:20px;
+  background:#fff;
+  margin:10px;
+  border-radius:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+.about h3{
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.about p{
+  font-size:14px;
+  line-height:1.5;
+  margin-bottom:10px;
+}
