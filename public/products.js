@@ -69,7 +69,7 @@ const products = [
     id: 7,
     name: "Tomato Pickle",
     category: "veg",
-    image: "images/tomata.jpg",
+    image: "images/tomota.jpg",
     variants: [
       { size: "250g", price: 79 },
       { size: "500g", price: 159 },
