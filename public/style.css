@@ -208,3 +208,15 @@ select{
   border-radius:50%;
   font-size:20px;
 }
+.logo-section{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.logo{
+  width:35px;
+  height:35px;
+  object-fit:contain;
+  border-radius:50%;
+}
