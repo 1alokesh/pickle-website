@@ -42,5 +42,28 @@ const products = [
       { size: "500g", price: 299 },
       { size: "1kg", price: 599 }
     ]
+  },
+  {
+    id: 5,
+    name: "Gongura Chicken Pickle",
+    category: "nonveg",
+    image: "images/gongura.jpg",
+    variants: [
+      { size: "250g", price: 229 },
+      { size: "500g", price: 449 },
+      { size: "1kg", price: 899 }
+    ]
+  },
+  {
+    id: 6,
+    name: "Peanut_chekkalu",
+    category: "snacks",
+    image: "images/Peanut_chekkalu_snacks.jpg",
+    variants: [
+      { size: "250g", price: 79 },
+      { size: "500g", price: 159 },
+      { size: "1kg", price: 300 }
+    ]
   }
 ];
+
