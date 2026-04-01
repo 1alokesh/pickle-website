@@ -8,44 +8,98 @@
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <h2>🌶️ Guntur Inti  Ruchulu</h2>
+  <h2>🌶️Guntur Inti Ruchulu</h2>
+
+  <input 
+    id="search" 
+    placeholder="Search..." 
+    oninput="searchProducts()"
+  >
+
   <button onclick="goToCart()">🛒</button>
 </div>
 
+<!-- CATEGORY -->
+<select onchange="filterCategory(this.value)">
+  <option value="all">Shop by Collection</option>
+  <option value="veg">Veg Pickles</option>
+  <option value="nonveg">Non-Veg Pickles</option>
+  <option value="snacks">Health & Sweet Snacks</option>
+</select>
+
+<!-- HERO -->
 <div class="hero">
   <h3>Authentic Homemade Pickles</h3>
 </div>
 
+<!-- PRODUCTS -->
 <div id="productList" class="products"></div>
+
+<!-- CART BAR -->
 <div id="cartBar" class="cart-bar"></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- WHATSAPP -->
+<a href="https://wa.me/919121991628" class="whatsapp" target="_blank">💬</a>
 
 <script src="products.js"></script>
 <script src="cart.js"></script>
 
 <script>
+let filteredProducts = [...products];
+
+/* RENDER PRODUCTS */
 function renderProducts(){
-  const c=document.getElementById("productList");
-  c.innerHTML="";
+  const container = document.getElementById("productList");
+  container.innerHTML = "";
 
-  products.forEach(p=>{
-    c.innerHTML+=`
-    <div class="card">
-      <img src="${p.image}">
-      <h3>${p.name}</h3>
+  filteredProducts.forEach(p=>{
+    container.innerHTML += `
+      <div class="card">
+        <img src="${p.image}">
+        <h3>${p.name}</h3>
 
-      ${p.variants.map((v,i)=>`
-        <div class="variant-row">
-          <span>${v.size} - ₹${v.price}</span>
-          <button onclick="addToCart(${p.id},${i})">ADD</button>
-        </div>
-      `).join("")}
+        ${p.variants.map((v,i)=>`
+          <div class="variant-row">
+            <span>${v.size} - ₹${v.price}</span>
+            <button onclick="addToCart(${p.id},${i})">ADD</button>
+          </div>
+        `).join("")}
 
-    </div>`;
+      </div>
+    `;
   });
 
   updateCartBar();
 }
+
+/* SEARCH */
+function searchProducts(){
+  const value = document.getElementById("search").value.toLowerCase();
+
+  filteredProducts = products.filter(p =>
+    p.name.toLowerCase().includes(value)
+  );
+
+  renderProducts();
+}
+
+/* CATEGORY FILTER */
+function filterCategory(category){
+  if(category === "all"){
+    filteredProducts = [...products];
+  } else {
+    filteredProducts = products.filter(p => p.category === category);
+  }
+
+  renderProducts();
+}
+
+/* INIT */
 renderProducts();
 </script>
 
